@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0B1120">
-  <title>RUSMASTER PRO AI</title>
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUlVTTEFTVEVSIFBSTyBBSSIsInNob3J0X25hbWUiOiJSVVNNQVNURVIiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBCMTEyMCIsInRoZW1lX2NvbG9yIjoiIzBCMTEyMCJ9">
+  <title>RUSMASTER PRO</title>
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUlVTTEFTVEVSIFBSTyIsInNob3J0X25hbWUiOiJSVVNNQVNURVIiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBCMTEyMCIsInRoZW1lX2NvbG9yIjoiIzBCMTEyMCJ9">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <style>
     :root{--bg:#0B1120;--card:#151E32;--accent:#3B82F6;--success:#10B981;--warn:#F59E0B;--error:#EF4444;--ai:#8B5CF6;--text:#F8FAFC;--muted:#94A3B8;--radius:14px;--shadow:0 6px 16px rgba(0,0,0,0.35);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
@@ -51,7 +51,6 @@
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
     .loader{display:inline-block;width:18px;height:18px;border:2px solid #334155;border-top:2px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
     
-    /* MODAL */
     .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
     .modal{background:var(--card);padding:20px;border-radius:var(--radius);width:100%;max-width:380px;box-shadow:var(--shadow)}
     .modal h2{margin-bottom:8px;font-size:16px}
@@ -61,12 +60,10 @@
     .modal .btn-outline{font-size:12px;padding:8px}
     .error-msg{color:var(--error);font-size:11px;margin-top:4px;display:none}
     
-    /* LESSON UI */
     .lesson-section{margin-bottom:14px}
     .lesson-section h3{font-size:14px;margin-bottom:6px;color:var(--accent)}
     .example{background:#0F172A;padding:10px;border-radius:8px;margin:6px 0;font-size:13px}
     .example .ru{font-weight:600}
-    .example .en{color:var(--muted);font-size:12px}
     .example .note{color:var(--warn);font-size:11px;margin-top:4px}
     .mistake{background:#1C0F11;padding:8px;border-radius:6px;margin:4px 0;font-size:12px;border-left:2px solid var(--error)}
     .exercise-item{background:#0F172A;padding:10px;border-radius:8px;margin:8px 0}
@@ -77,6 +74,17 @@
     .result-box .correct{color:var(--success);font-weight:600}
     .result-box .err{color:var(--error);text-decoration:line-through}
 
+    /* QUIZ STYLES */
+    .quiz-card{background:#0F172A;padding:14px;border-radius:10px;margin:8px 0}
+    .quiz-q{font-weight:600;margin-bottom:10px}
+    .quiz-opts{display:grid;gap:6px}
+    .quiz-opt{padding:10px;background:#1E293B;border:1.5px solid #334155;border-radius:8px;cursor:pointer;transition:all .15s}
+    .quiz-opt:hover{background:#334155}
+    .quiz-opt.selected{border-color:var(--accent);background:rgba(59,130,246,0.1)}
+    .quiz-opt.correct{border-color:var(--success);background:rgba(16,185,129,0.1)}
+    .quiz-opt.wrong{border-color:var(--error);background:rgba(239,68,68,0.1)}
+    .quiz-expl{margin-top:8px;font-size:12px;color:var(--muted);padding:8px;background:rgba(245,158,11,0.1);border-radius:6px;border-left:3px solid var(--warn);display:none}
+    
     @media(max-width:360px){.tabs{gap:4px}.tab{padding:7px 10px;font-size:12px}}
   </style>
 </head>
@@ -88,16 +96,17 @@
 
   <div class="tabs">
     <div class="tab active" data-screen="home">🏠 Старт</div>
-    <div class="tab" data-screen="curriculum">📚 Курс</div>
+    <div class="tab" data-screen="explore">🔍 Поиск</div>
+    <div class="tab" data-screen="quiz">🎯 Тест</div>
     <div class="tab" data-screen="textcheck">📝 Текст</div>
-    <div class="tab" data-screen="ai">🤖 AI-Чат</div>
+    <div class="tab" data-screen="ai">🤖 Чат</div>
     <div class="tab" data-screen="progress">📊 Прогресс</div>
   </div>
 
   <div id="home" class="screen active">
     <div class="card">
-      <h2>🎯 Персональная траектория</h2>
-      <p>AI генерирует уроки в реальном времени. Адаптируется к вашим ошибкам. Кэширует пройденное.</p>
+      <h2>🌐 Безлимитное изучение</h2>
+      <p>Введите любую тему: грамматику, стилистику, фразеологию, деловой русский, исторические формы, диалекты, нюансы ударений и т.д. AI сгенерирует полный урок за секунды.</p>
       <div class="progress-ring">
         <svg width="56" height="56" viewBox="0 0 56 56">
           <circle class="progress-bg" cx="28" cy="28" r="24"/>
@@ -105,37 +114,56 @@
         </svg>
         <div class="progress-text" id="home-percent">0%</div>
       </div>
-      <button class="btn" onclick="goToCurriculum()">▶️ Начать обучение</button>
+      <button class="btn" onclick="goExplore()">🔍 Начать исследование</button>
     </div>
     <div class="card">
       <h2>📅 План на сегодня</h2>
-      <ul style="padding-left:18px;color:var(--muted);line-height:1.6;font-size:12px" id="daily-plan"><li>Загрузка...</li></ul>
+      <ul style="padding-left:16px;color:var(--muted);line-height:1.5;font-size:12px" id="daily-plan"><li>Загрузка...</li></ul>
+    </div>
+    <div class="card">
+      <h2>🎯 Ежедневный тест</h2>
+      <p>AI подберёт 5-10 вопросов по вашим слабым местам. Несколько вариантов ответа, мгновенная проверка с объяснением.</p>
+      <button class="btn btn-ai" onclick="goQuiz()">🚀 Пройти тест</button>
     </div>
   </div>
 
-  <div id="curriculum" class="screen">
+  <div id="explore" class="screen">
     <div class="card">
-      <h2>📖 Учебный план</h2>
-      <p>Выберите тему. AI подготовит объяснение, примеры, типичные ошибки и тест.</p>
-      <div id="curriculum-list" style="display:grid;gap:8px;margin-top:10px;max-height:65vh;overflow-y:auto"></div>
+      <h2>🔍 Динамический поиск</h2>
+      <p>Введите тему на любом уровне детализации. AI найдёт, структурирует и объяснит.</p>
+      <input class="input-field" id="topic-input" placeholder="Напр: Винительный падеж после числительных, Оттенки значения глагола 'ставить', Разговорные сокращения...">
+      <button class="btn" style="margin-top:6px" onclick="searchTopic()">🔎 Сгенерировать урок</button>
+      <div id="topic-history" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px"></div>
     </div>
   </div>
 
   <div id="lesson" class="screen">
     <div class="card">
       <h2 id="lesson-title">Урок</h2>
-      <div id="lesson-content" style="min-height:300px"></div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn-outline" onclick="prevLesson()">◀ Назад</button>
-        <button class="btn" onclick="nextLesson()">Далее ▶</button>
+      <div id="lesson-content" style="min-height:280px"></div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="prevTopic()">◀ Назад</button>
+        <button class="btn" onclick="exploreDeeper()">🔍 Углубить</button>
+        <button class="btn" style="background:var(--ai)" onclick="goExplore()">📚 Новая тема</button>
       </div>
+    </div>
+  </div>
+
+  <div id="quiz" class="screen">
+    <div class="card">
+      <h2>🎯 Ежедневный тест</h2>
+      <p id="quiz-desc">AI подберёт вопросы по вашим слабым местам. Выберите правильный вариант.</p>
+      <div id="quiz-container" style="margin-top:12px"></div>
+      <div id="quiz-result" style="margin-top:12px;display:none"></div>
+      <button class="btn" id="quiz-submit" onclick="submitQuiz()" style="display:none;margin-top:12px">✅ Проверить ответы</button>
+      <button class="btn btn-outline" onclick="generateNewQuiz()" style="margin-top:8px">🔄 Новые вопросы</button>
     </div>
   </div>
 
   <div id="textcheck" class="screen">
     <div class="card">
       <h2>📝 Проверка текста</h2>
-      <p>Вставьте сочинение, письмо или сообщение. AI исправит орфографию, грамматику, пунктуацию и объяснит каждую ошибку.</p>
+      <p>Вставьте любой объём. AI исправит орфографию, грамматику, пунктуацию, стилистику и объяснит каждую правку.</p>
       <textarea class="input-field" id="text-input" placeholder="Ваш текст..."></textarea>
       <button class="btn" id="check-btn" onclick="checkLongText()">🔍 Анализировать</button>
       <div id="text-result" class="result-box" style="display:none"></div>
@@ -144,11 +172,11 @@
 
   <div id="ai" class="screen">
     <div class="ai-chat" id="ai-chat">
-      <div class="msg ai"><strong>🤖 AI-Репетитор:</strong> Привет! Я проверяю предложения, объясняю правила и подбираю упражнения. Пишите на русском.</div>
+      <div class="msg ai"><strong>🤖 AI-Репетитор:</strong> Привет! Задавайте вопросы, просите примеры, уточняйте нюансы. Я объясню как профессор.</div>
     </div>
     <div class="input-area">
-      <input class="input-field" id="ai-input" placeholder="Напишите фразу или вопрос...">
-      <button class="btn" style="width:auto;padding:10px 14px" onclick="sendToAI()">➤</button>
+      <input class="input-field" id="ai-input" placeholder="Вопрос или фраза...">
+      <button class="btn" style="width:auto;padding:9px 12px" onclick="sendToAI()">➤</button>
     </div>
   </div>
 
@@ -156,65 +184,69 @@
     <div class="card">
       <h2>📊 Аналитика</h2>
       <div id="stats-container"></div>
-      <div style="display:flex;gap:8px;margin-top:12px">
+      <div style="display:flex;gap:6px;margin-top:10px">
         <button class="btn btn-warn" onclick="resetProgress()">🔄 Сброс</button>
-        <button class="btn" onclick="exportPDF()">📄 PDF-отчёт</button>
+        <button class="btn" onclick="exportPDF()">📄 PDF</button>
       </div>
     </div>
   </div>
 
-  <!-- API KEY MODAL -->
   <div class="modal-overlay" id="api-modal">
     <div class="modal">
-      <h2>🔑 Подключение AI-ядра</h2>
-      <p>Для динамической генерации уроков и проверки текстов нужен бесплатный API-ключ Groq. Без него работает упрощённый офлайн-режим.</p>
-      <input class="input-field" id="api-key-input" placeholder="gsk_... или sk-..." autocomplete="off">
+      <h2>🔑 Подключение AI</h2>
+      <p>Без ключа Groq система работает в ограниченном офлайн-режиме. С ключом — безлимитная генерация любых тем.</p>
+      <input class="input-field" id="api-key-input" placeholder="gsk_..." autocomplete="off">
       <div class="error-msg" id="api-error"></div>
-      <button class="btn" onclick="validateKey()">✅ Проверить и войти</button>
-      <button class="btn btn-outline" onclick="enterOfflineMode()">🌐 Офлайн-режим</button>
+      <button class="btn" onclick="validateKey()">✅ Проверить</button>
+      <button class="btn btn-outline" onclick="enterOfflineMode()">🌐 Офлайн</button>
     </div>
   </div>
 
   <script>
-    // === STATE & INIT ===
+    // === STATE ===
     const state = {
-      streak: 0, lastDate: null, progress: 0, completedTopics: [], weakPoints: [], 
+      streak: 0, lastDate: null, progress: 0, exploredTopics: [], weakPoints: [], 
       groqKey: localStorage.getItem('rusmaster_pro_key') || '', isOffline: false,
-      currentTopic: null, lessonCache: {}, level: 'A1', lessonHistory: []
+      currentTopic: null, lessonCache: {}, history: [], level: 'A1',
+      quizHistory: [], quizLastDate: null, quizScore: 0
     };
 
+    // === INIT ===
     window.onload = async () => {
       loadState();
-      if(!state.groqKey || state.groqKey.length < 15) {
-        document.getElementById('api-modal').style.display = 'flex';
-      } else {
-        const v = await testKey(state.groqKey);
-        if(!v) { showModalError('⚠️ Ключ недействителен. Введите новый.'); }
-      }
+      if(!state.groqKey || state.groqKey.length < 15) document.getElementById('api-modal').style.display = 'flex';
+      else { const v = await testKey(state.groqKey); if(!v) showModalError('⚠️ Ключ недействителен.'); }
       renderAll();
     };
 
     const loadState = () => {
-      try { const s=localStorage.getItem('rusmaster_pro_v1'); if(s) Object.assign(state, JSON.parse(s)); } catch(e){}
+      try { const s=localStorage.getItem('rusmaster_pro_v2'); if(s) Object.assign(state, JSON.parse(s)); } catch(e){}
       if(!state.lastDate) state.lastDate = new Date().toISOString();
       const today = new Date().toISOString().slice(0,10);
       const last = state.lastDate.slice(0,10);
       if(today !== last) {
-        const diff = Math.floor((new Date(today) - new Date(last))/864e5);
+        const diff = Math.floor((new Date(today)-new Date(last))/864e5);
         state.streak = diff===1 ? state.streak+1 : (diff>1 ? 1 : state.streak);
         state.lastDate = new Date().toISOString();
+        // Reset quiz daily
+        if(state.quizLastDate !== today) { state.quizDoneToday = false; state.quizLastDate = today; }
       }
       saveState();
     };
+    const saveState = () => {
+      if(Object.keys(state.lessonCache).length > 15) {
+        const keys = Object.keys(state.lessonCache);
+        keys.slice(0, keys.length-15).forEach(k => delete state.lessonCache[k]);
+      }
+      localStorage.setItem('rusmaster_pro_v2', JSON.stringify(state));
+    };
 
-    const saveState = () => localStorage.setItem('rusmaster_pro_v1', JSON.stringify(state));
-
-    // === API & KEY ===
+    // === API ===
     async function testKey(key) {
       try {
         const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method:'POST', headers:{'Authorization':`Bearer ${key}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'user',content:'test'}], max_tokens:1})
+          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'user',content:'ping'}], max_tokens:1})
         });
         return r.status===200;
       } catch(e){return false;}
@@ -223,173 +255,249 @@
     window.validateKey = async () => {
       const key = document.getElementById('api-key-input').value.trim();
       if(!key || key.length<10) return showModalError('⚠️ Введите корректный ключ.');
-      const btn = document.querySelector('#api-modal .btn');
-      btn.innerHTML='<span class="loader"></span> Проверка...'; btn.disabled=true;
+      const btn = document.querySelector('#api-modal .btn'); btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
       const valid = await testKey(key);
-      if(valid) {
-        state.groqKey=key; localStorage.setItem('rusmaster_pro_key', key);
-        document.getElementById('api-modal').style.display='none'; renderAll();
-      } else showModalError('❌ Ключ недействителен или лимит исчерпан.');
-      btn.innerHTML='✅ Проверить и войти'; btn.disabled=false;
+      if(valid) { state.groqKey=key; localStorage.setItem('rusmaster_pro_key', key); document.getElementById('api-modal').style.display='none'; renderAll(); }
+      else showModalError('❌ Ключ недействителен.');
+      btn.innerHTML='✅ Проверить'; btn.disabled=false;
     };
+    window.enterOfflineMode = () => { state.isOffline=true; document.getElementById('api-modal').style.display='none'; alert('🌐 Офлайн: базовые правила доступны. Для безлимита добавьте ключ.'); renderAll(); };
+    function showModalError(m){ document.getElementById('api-error').textContent=m; document.getElementById('api-error').style.display='block'; }
 
-    window.enterOfflineMode = () => {
-      state.isOffline=true;
-      document.getElementById('api-modal').style.display='none';
-      alert('🌐 Офлайн-режим активен. AI-уроки генерируются по встроенным правилам. Для полного функционала добавьте ключ.');
-      renderAll();
-    };
-
-    function showModalError(msg){
-      const e=document.getElementById('api-error'); e.textContent=msg; e.style.display='block';
-    }
-
-    // === NAVIGATION ===
+    // === NAV ===
     document.querySelectorAll('.tab').forEach(t=>{
       t.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
         document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
         document.getElementById(t.dataset.screen).classList.add('active');
       });
     });
-    window.goToCurriculum = ()=>{ document.querySelector('[data-screen="curriculum"]').click(); renderCurriculum(); };
+    window.goExplore = ()=>{ document.querySelector('[data-screen="explore"]').click(); renderHistory(); };
+    window.goQuiz = ()=>{ document.querySelector('[data-screen="quiz"]').click(); generateDailyQuiz(); };
 
-    // === CURRICULUM DATA ===
-    const CURRICULUM = [
-      {id:'alphabet', title:'🔤 Алфавит и произношение', mod:1},
-      {id:'gender_plural', title:'🧬 Род и множественное число', mod:2},
-      {id:'pronouns_personal', title:'👤 Личные местоимения', mod:2},
-      {id:'pronouns_possessive', title:'🔐 Притяжательные местоимения', mod:2},
-      {id:'verbs_aspect', title:'🔄 Глаголы: НСВ / СВ', mod:3},
-      {id:'verbs_past', title:'⏪ Прошедшее время', mod:3},
-      {id:'verbs_present', title:'⏱ Настоящее время', mod:3},
-      {id:'verbs_future', title:'⏩ Будущее время', mod:3},
-      {id:'verbs_reflexive', title:'🔁 Возвратные глаголы (-ся/-сь)', mod:3},
-      {id:'verbs_motion', title:'🚶 Глаголы движения', mod:3},
-      {id:'numbers', title:'🔢 Числа и цифры', mod:4},
-      {id:'time_dates', title:'📅 Время и даты', mod:4},
-      {id:'about_me', title:'🗣 Говорим о себе', mod:5},
-      {id:'case_nom', title:'🗝️ Именительный падеж', mod:6},
-      {id:'case_gen', title:'🗝️ Родительный падеж', mod:6},
-      {id:'case_gen_prep', title:'🗝️ Р.п.: предлоги и местоимения', mod:6},
-      {id:'case_dat', title:'🗝️ Дательный падеж', mod:6},
-      {id:'case_dat_prep', title:'🗝️ Д.п.: предлоги и местоимения', mod:6},
-      {id:'case_acc', title:'🗝️ Винительный падеж', mod:6},
-      {id:'case_acc_prep', title:'🗝️ В.п.: предлоги и местоимения', mod:6},
-      {id:'case_ins', title:'🗝️ Творительный падеж', mod:6},
-      {id:'case_prep', title:'🗝️ Предложный падеж', mod:6}
-    ];
+    // === DYNAMIC AI ENGINE ===
+    async function generateLesson(topic) {
+      const prompt = `Ты — профессор русского языка и лингвист. Создай ПОЛНЫЙ, СТРУКТУРИРОВАННЫЙ урок по теме: "${topic}".
+      Уровень ученика: ${state.level}.
+      Верни ТОЛЬКО валидный JSON без markdown:
+      {
+        "title": "Название урока",
+        "explanation": "Подробное, академическое, но понятное объяснение (3-4 абзаца). Включи правила, логику, исключения, исторический контекст если уместно.",
+        "grammar_focus": ["Ключевые правила или конструкции"],
+        "examples": [
+          {"ru":"Пример предложения на русском","note":"Грамматическое пояснение на русском"},
+          {"ru":"Ещё пример","note":"Пояснение"},
+          {"ru":"Третий пример","note":"Пояснение"}
+        ],
+        "exceptions": ["Важные исключения или нюансы"],
+        "common_mistakes": [
+          {"wrong":"Неверный вариант","correct":"Верный вариант","reason":"Почему это ошибка и как запомнить"}
+        ],
+        "practice": {
+          "type":"fill_gap",
+          "items":[
+            {"question":"Вставьте слово: Я ___ (читать) книгу каждый день.","answer":"читаю","hint":"Настоящее время, 1-е лицо"}
+          ]
+        },
+        "usage_context": "Где и как это используется в реальной речи/письме: быт, работа, литература, официальные документы",
+        "related_topics": ["3 смежные темы для углубления"]
+      }`;
 
-    function renderCurriculum(){
-      const c=document.getElementById('curriculum-list');
-      c.innerHTML=CURRICULUM.map(t=>{
-        const done=state.completedTopics.includes(t.id);
-        return `<div class="tag ${done?'strong':''}" onclick="loadLesson('${t.id}')" style="padding:10px;justify-content:flex-start">
-          ${t.title} ${done?'✅':''}
-        </div>`;
-      }).join('');
-    }
+      if(state.isOffline || !state.groqKey) return getFallback(topic);
 
-    // === AI ENGINE ===
-    async function generateLesson(topicId) {
-      const topic = CURRICULUM.find(t=>t.id===topicId)?.title || topicId;
-      const prompt = `Ты профессор русского языка. Создай подробный урок: "${topic}". Уровень: ${state.level}. 
-      Верни СТРОГО JSON без markdown: {"title":"...","explanation":"...","examples":[{"ru":"...","en":"...","note":"..."}],"common_mistakes":[{"wrong":"...","correct":"...","reason":"..."}],"exercise":{"type":"fill_gap","items":[{"question":"...","answer":"..."}]},"cultural_note":"..."}`;
-      
-      if(state.isOffline || !state.groqKey) return getFallbackLesson(topicId);
-      
       try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Отвечай только валидным JSON.'},{role:'user',content:prompt}], max_tokens:1200, temperature:0.1})
+          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Отвечай только валидным JSON без markdown.'},{role:'user',content:prompt}], max_tokens:1800, temperature:0.1})
         });
-        const data = await res.json();
-        let raw = data.choices[0].message.content;
-        raw = raw.replace(/^
+        const d = await res.json();
+        let raw = d.choices[0].message.content.replace(/^
 ```json\s*/i,'').replace(/
 ```$/,'').trim();
+        const start=raw.indexOf('{'), end=raw.lastIndexOf('}');
+        if(start!==-1&&end!==-1) raw=raw.slice(start,end+1);
         return JSON.parse(raw);
-      } catch(e) { return getFallbackLesson(topicId); }
+      } catch(e) { return getFallback(topic); }
     }
 
-    function getFallbackLesson(id) {
-      // Встроенная база для критических тем
-      const base = {
-        title: CURRICULUM.find(t=>t.id===id)?.title || 'Урок',
-        explanation: 'Тема требует AI для полной генерации. В офлайн-режиме доступны базовые правила. Добавьте ключ Groq для динамического контента.',
-        examples: [{ru:'Пример генерации AI', en:'AI generation example', note:'Включите интернет и ключ'}],
-        common_mistakes: [{wrong:'Нет данных', correct:'AI сгенерирует', reason:'Требуется подключение'}],
-        exercise: {type:'fill_gap', items:[{question:'AI офлайн', answer:'активировать'}]},
-        cultural_note:'Русский язык имеет 6 падежей и сложную систему глаголов. Практика решает.'
+    function getFallback(t) {
+      return {
+        title: t,
+        explanation: 'В офлайн-режиме доступна базовая логика. Для полного разбора подключите ключ Groq. Тема требует анализа контекста и исключений.',
+        grammar_focus: ['Базовые правила'], examples: [{ru:'Пример', note:'AI генерирует при подключении'}],
+        exceptions: ['Зависит от контекста'], common_mistakes: [{wrong:'Ошибка', correct:'Верно', reason:'AI уточнит'}],
+        practice: {type:'fill_gap', items:[{question:'AI офлайн', answer:'активировать'}]},
+        usage_context: 'Используется в письменной и устной речи.', related_topics: ['Смежная тема 1', 'Смежная тема 2']
       };
-      if(id==='case_nom') base.explanation='Именительный падеж: форма слова в словаре. Отвечает на Кто? Что? Подлежащее стоит в Им.п. Окончания: муж.р. нулевое или -й/-ь, жен.р. -а/-я, сред.р. -о/-е.';
-      if(id==='verbs_aspect') base.explanation='НСВ (что делать?) = процесс, повторение. СВ (что сделать?) = результат, завершение. Пары: читать-прочитать, писать-написать.';
-      if(id==='case_gen') base.explanation='Родительный падеж: Кого? Чего? Указывает на отсутствие, принадлежность, часть. Предлоги: у, без, из, от, до. Окончания: -а/-я, -у/-ю.';
-      return base;
     }
 
-    async function loadLesson(id) {
+    async function searchTopic() {
+      const inp = document.getElementById('topic-input');
+      const topic = inp.value.trim(); if(!topic) return;
+      inp.value = '';
+      
       document.querySelector('[data-screen="lesson"]').click();
-      state.currentTopic = id;
+      state.currentTopic = topic;
+      if(!state.history.includes(topic)) state.history.unshift(topic);
+      if(state.history.length>20) state.history.pop();
+      saveState();
+
       const cont = document.getElementById('lesson-content');
       const title = document.getElementById('lesson-title');
-      title.textContent = CURRICULUM.find(t=>t.id===id)?.title || 'Урок';
-      cont.innerHTML = '<div style="text-align:center;padding:30px"><span class="loader"></span> AI готовит урок...</div>';
+      title.textContent = '⏳ Генерация...';
+      cont.innerHTML = '<div style="text-align:center;padding:20px"><span class="loader"></span> AI анализирует тему, собирает правила, исключения, примеры...</div>';
 
-      const cached = state.lessonCache[id];
-      const lesson = cached || await generateLesson(id);
-      if(!cached) { state.lessonCache[id]=lesson; saveState(); }
+      const cached = state.lessonCache[topic];
+      const lesson = cached || await generateLesson(topic);
+      if(!cached) { state.lessonCache[topic]=lesson; saveState(); }
       renderLesson(lesson);
-      if(!state.completedTopics.includes(id)) {
-        state.completedTopics.push(id);
-        state.progress = Math.min(100, state.progress + 4.5);
+      
+      if(!state.exploredTopics.includes(topic)) {
+        state.exploredTopics.push(topic);
+        state.progress = Math.min(100, state.progress + 3);
         saveState();
       }
     }
 
     function renderLesson(les) {
       const cont = document.getElementById('lesson-content');
+      document.getElementById('lesson-title').textContent = les.title;
       let html = `<div class="lesson-section"><p>${les.explanation.replace(/\n/g,'<br>')}</p></div>`;
-      html += `<div class="lesson-section"><h3>💡 Примеры</h3>${les.examples.map(e=>`<div class="example"><div class="ru">${e.ru}</div><div class="en">${e.en}</div><div class="note">📝 ${e.note}</div></div>`).join('')}</div>`;
-      html += `<div class="lesson-section"><h3>⚠️ Частые ошибки</h3>${les.common_mistakes.map(m=>`<div class="mistake"><strong>${m.wrong}</strong> → <span class="correct">${m.correct}</span><br>${m.reason}</div>`).join('')}</div>`;
-      html += `<div class="lesson-section"><h3>✍️ Практика</h3><div id="exercises">${les.exercise.items.map((ex,i)=>`<div class="exercise-item"><div class="q">${i+1}. ${ex.question}</div><input type="text" id="ans_${i}" placeholder="Ваш ответ..."><div class="feedback" id="feed_${i}"></div><button class="btn btn-outline" style="margin-top:6px;padding:6px" onclick="checkAnswer(${i},'${ex.answer.replace(/'/g,"\\'")}')">Проверить</button></div>`).join('')}</div></div>`;
-      if(les.cultural_note) html += `<div class="lesson-section"><h3>🌍 Контекст</h3><p>${les.cultural_note}</p></div>`;
+      if(les.grammar_focus?.length) html+=`<div class="lesson-section"><h3>📐 Фокус</h3><div style="display:flex;flex-wrap:wrap;gap:5px">${les.grammar_focus.map(g=>`<span class="tag">${g}</span>`).join('')}</div></div>`;
+      html += `<div class="lesson-section"><h3>💡 Примеры</h3>${les.examples.map(e=>`<div class="example"><div class="ru">${e.ru}</div><div class="note">📝 ${e.note}</div></div>`).join('')}</div>`;
+      if(les.exceptions?.length) html+=`<div class="lesson-section"><h3>⚠️ Исключения</h3><p style="font-size:12px;color:var(--warn)">${les.exceptions.join('; ')}</p></div>`;
+      html += `<div class="lesson-section"><h3>🚫 Частые ошибки</h3>${les.common_mistakes.map(m=>`<div class="mistake"><strong>${m.wrong}</strong> → <span class="correct">${m.correct}</span><br>${m.reason}</div>`).join('')}</div>`;
+      html += `<div class="lesson-section"><h3>✍️ Практика</h3><div id="exercises">${les.practice.items.map((ex,i)=>`<div class="exercise-item"><div class="q">${i+1}. ${ex.question}</div><input type="text" id="ans_${i}" placeholder="Ответ..."><div class="feedback" id="feed_${i}"></div><button class="btn btn-outline" style="margin-top:5px;padding:5px" onclick="checkAnswer(${i},'${ex.answer.replace(/'/g,"\\'")}')">Проверить</button></div>`).join('')}</div></div>`;
+      if(les.usage_context) html+=`<div class="lesson-section"><h3>🌍 Контекст</h3><p>${les.usage_context}</p></div>`;
+      if(les.related_topics?.length) html+=`<div class="lesson-section"><h3>🔗 Углубить</h3><div style="display:flex;flex-wrap:wrap;gap:5px">${les.related_topics.map(t=>`<span class="tag" onclick="quickSearch('${t.replace(/'/g,"\\'")}')">${t}</span>`).join('')}</div></div>`;
       cont.innerHTML = html;
     }
+
+    window.quickSearch = (t) => { document.getElementById('topic-input').value=t; searchTopic(); };
+    window.exploreDeeper = () => { quickSearch(`Углублённо: ${state.currentTopic}`); };
+    window.prevTopic = () => { if(state.history.length>1) { state.history.shift(); quickSearch(state.history[0]); } else goExplore(); };
 
     window.checkAnswer = async (i, correct) => {
       const user = document.getElementById(`ans_${i}`).value.trim();
       const feed = document.getElementById(`feed_${i}`);
-      feed.innerHTML='<span class="loader" style="width:12px;height:12px"></span>';
+      feed.innerHTML='<span class="loader" style="width:10px;height:10px"></span>';
       if(user.toLowerCase()===correct.toLowerCase()) { feed.innerHTML='<span style="color:var(--success)">✅ Верно!</span>'; return; }
       
       if(!state.isOffline && state.groqKey) {
         try {
-          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-            body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Коротко объясни ошибку (1 предложение).'}], max_tokens:30})
+            body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Коротко объясни ошибку (1 предложение) на русском.'}], max_tokens:30})
           });
-          const data = await res.json();
-          feed.innerHTML=`❌ Нет. ${data.choices[0].message.content} Правильно: <strong>${correct}</strong>`;
-        } catch(e) { feed.innerHTML=`❌ Нет. Правильно: <strong>${correct}</strong>`; }
-      } else {
-        feed.innerHTML=`❌ Нет. Правильно: <strong>${correct}</strong>`;
-      }
-      state.weakPoints.push(state.currentTopic); saveState();
+          const d = await r.json();
+          feed.innerHTML=`❌ Нет. ${d.choices[0].message.content} Верно: <strong>${correct}</strong>`;
+        } catch(e) { feed.innerHTML=`❌ Нет. Верно: <strong>${correct}</strong>`; }
+      } else feed.innerHTML=`❌ Нет. Верно: <strong>${correct}</strong>`;
+      if(state.currentTopic && !state.weakPoints.includes(state.currentTopic)) state.weakPoints.push(state.currentTopic);
+      saveState();
     };
 
-    window.nextLesson = () => {
-      const list = CURRICULUM.map(t=>t.id);
-      const idx = list.indexOf(state.currentTopic);
-      if(idx<list.length-1) loadLesson(list[idx+1]);
-      else alert('🎉 Курс пройден! Переходим к свободной практике.');
+    // === DAILY QUIZ GENERATOR ===
+    async function generateDailyQuiz() {
+      const cont = document.getElementById('quiz-container');
+      cont.innerHTML = '<div style="text-align:center;padding:20px"><span class="loader"></span> AI готовит тест...</div>';
+      document.getElementById('quiz-result').style.display = 'none';
+      document.getElementById('quiz-submit').style.display = 'none';
+
+      if(state.isOffline || !state.groqKey) {
+        cont.innerHTML = '<p style="color:var(--warn)">🌐 Офлайн-режим: тесты недоступны. Подключите ключ Groq для адаптивных вопросов.</p>';
+        return;
+      }
+
+      try {
+        const weak = state.weakPoints.length ? `Ученик испытывает сложности с: ${state.weakPoints.join(', ')}.` : '';
+        const prompt = `Создай ежедневный тест по русскому языку. Уровень: ${state.level}. ${weak}
+        Верни ТОЛЬКО валидный JSON массив из 5-7 вопросов:
+        [
+          {
+            "question": "Текст вопроса (может быть коротким предложением или текстом до 20 слов)",
+            "options": ["Вариант А", "Вариант Б", "Вариант В", "Вариант Г"],
+            "correct": 0,
+            "explanation": "Подробное объяснение правильного ответа на русском: почему этот вариант верен, а другие — нет. Включи правило или пример."
+          }
+        ]
+        Вопросы должны проверять: грамматику, орфографию, пунктуацию, лексику, стилистику. Чередуй типы: выбор окончания, предлога, падежа, вида глагола, порядка слов.`;
+
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
+          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Отвечай только валидным JSON массивом.'},{role:'user',content:prompt}], max_tokens:1500, temperature:0.2})
+        });
+        const d = await res.json();
+        let raw = d.choices[0].message.content.replace(/^
+```json\s*/i,'').replace(/
+```$/,'').trim();
+        const start=raw.indexOf('['), end=raw.lastIndexOf(']');
+        if(start!==-1&&end!==-1) raw=raw.slice(start,end+1);
+        const quiz = JSON.parse(raw);
+        renderQuiz(quiz);
+      } catch(e) {
+        cont.innerHTML = '<p style="color:var(--error)">⚠️ Ошибка генерации теста. Проверьте ключ или попробуйте позже.</p>';
+      }
+    }
+
+    function renderQuiz(quiz) {
+      const cont = document.getElementById('quiz-container');
+      let html = '';
+      quiz.forEach((q, idx) => {
+        html += `<div class="quiz-card" data-idx="${idx}">
+          <div class="quiz-q">${idx+1}. ${q.question}</div>
+          <div class="quiz-opts">
+            ${q.options.map((opt, i) => `<div class="quiz-opt" data-opt="${i}" onclick="selectOption(${idx},${i})">${opt}</div>`).join('')}
+          </div>
+          <div class="quiz-expl" id="expl-${idx}"><strong>💡 Объяснение:</strong> ${q.explanation}</div>
+        </div>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById('quiz-submit').style.display = 'block';
+      state.currentQuiz = quiz;
+    }
+
+    window.selectOption = (qIdx, optIdx) => {
+      const card = document.querySelector(`.quiz-card[data-idx="${qIdx}"]`);
+      card.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
+      card.querySelector(`.quiz-opt[data-opt="${optIdx}"]`).classList.add('selected');
+      card.dataset.selected = optIdx;
     };
-    window.prevLesson = () => {
-      const list = CURRICULUM.map(t=>t.id);
-      const idx = list.indexOf(state.currentTopic);
-      if(idx>0) loadLesson(list[idx-1]);
+
+    window.submitQuiz = async () => {
+      const cards = document.querySelectorAll('.quiz-card');
+      let score = 0, total = cards.length;
+      
+      cards.forEach(card => {
+        const idx = card.dataset.idx;
+        const selected = card.dataset.selected;
+        const correct = state.currentQuiz[idx].correct;
+        const expl = document.getElementById(`expl-${idx}`);
+        
+        if(selected == correct) {
+          card.querySelector(`.quiz-opt[data-opt="${selected}"]`).classList.add('correct');
+          score++;
+        } else {
+          card.querySelector(`.quiz-opt[data-opt="${selected}"]`)?.classList.add('wrong');
+          card.querySelector(`.quiz-opt[data-opt="${correct}"]`).classList.add('correct');
+          if(state.currentTopic && !state.weakPoints.includes(state.currentTopic)) state.weakPoints.push(state.currentTopic);
+        }
+        expl.style.display = 'block';
+      });
+      
+      state.quizScore = Math.round((score/total)*100);
+      state.progress = Math.min(100, state.progress + state.quizScore/10);
+      
+      const result = document.getElementById('quiz-result');
+      result.style.display = 'block';
+      result.innerHTML = `<p style="text-align:center;font-size:16px;font-weight:700">🎯 Результат: ${score}/${total} (${state.quizScore}%)</p>
+        <p style="text-align:center;color:var(--muted);font-size:12px">AI запомнит ошибки для будущих тестов.</p>`;
+      
+      document.getElementById('quiz-submit').style.display = 'none';
+      saveState(); renderAll();
     };
+
+    window.generateNewQuiz = () => { generateDailyQuiz(); };
 
     // === TEXT CHECKER ===
     window.checkLongText = async () => {
@@ -406,7 +514,7 @@
       }
 
       try {
-        const p = `Проверь текст на русском. Верни СТРОГО JSON: {"corrected":"полный исправленный текст","errors":[{"wrong":"фраза","correct":"фраза","reason":"правило"}]}`;
+        const p = `Проверь текст на русском. Верни СТРОГО JSON: {"corrected":"полный исправленный текст","errors":[{"wrong":"фраза","correct":"фраза","reason":"правило на русском"}]}`;
         const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
           body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Только JSON.'},{role:'user',content:p+`\nТекст: "${txt}"`}], max_tokens:600, temperature:0.1})
@@ -441,7 +549,7 @@
       try {
         const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Ты репетитор русского языка. Отвечай кратко, дружелюбно, с примерами. Макс 3 предложения.'},{role:'user',content:txt}], max_tokens:100})
+          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Ты репетитор русского языка. Отвечай кратко, дружелюбно, с примерами на русском. Макс 4 предложения.'},{role:'user',content:txt}], max_tokens:120})
         });
         const d = await r.json();
         t.remove(); chat.innerHTML+=`<div class="msg ai"><strong>🤖 AI:</strong> ${d.choices[0].message.content}</div>`; chat.scrollTop=chat.scrollHeight;
@@ -457,30 +565,34 @@
       document.getElementById('ring-progress').style.strokeDashoffset = 150.8 - (state.progress/100)*150.8;
       document.getElementById('stats-container').innerHTML = `
         <div style="display:grid;gap:8px;margin-bottom:10px">
-          <div class="tag strong">✅ Тем: ${state.completedTopics.length}/${CURRICULUM.length}</div>
-          <div class="tag critical">⚠️ Зоны роста: ${new Set(state.weakPoints).size}</div>
-          <div class="tag">📚 Уроков: ${state.lessonHistory.length}</div>
+          <div class="tag strong">✅ Тем изучено: ${state.exploredTopics.length}</div>
+          <div class="tag critical">⚠️ Зоны роста: ${state.weakPoints.length}</div>
+          <div class="tag">🎯 Тестов пройдено: ${state.quizHistory.length}</div>
           <div class="tag">🔑 AI: ${state.isOffline?'Офлайн':'Глобал'}</div>
         </div>`;
-      const plans = ['🔤 Алфавит + произношение','📐 Род и падежи','🗣 Говорим о себе','📝 Проверка текста'];
+      const plans = ['🔍 Выберите любую тему','🎯 Пройдите ежедневный тест','📝 Проверьте 1 текст','🤖 Задайте 2 вопроса AI'];
       document.getElementById('daily-plan').innerHTML = plans.slice(0, state.progress<20?2:4).map(p=>`<li>${p}</li>`).join('');
+      renderHistory();
     };
-
+    const renderHistory = () => {
+      const c = document.getElementById('topic-history');
+      c.innerHTML = state.history.map(h=>`<span class="tag" onclick="quickSearch('${h.replace(/'/g,"\\'")}')">${h}</span>`).join('');
+    };
     window.exportPDF = () => {
       if(!window.jspdf) return alert('📦 PDF-библиотека загружается. Подождите 5 сек.');
       const {jsPDF} = window.jspdf; const doc = new jsPDF();
       doc.setFontSize(18); doc.text('🇷🇺 RUSMASTER PRO — Отчёт', 20, 20);
       doc.setFontSize(12); doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')}`, 20, 35);
       doc.text(`Прогресс: ${state.progress}% | Серия: ${state.streak} дн.`, 20, 45);
-      doc.text(`Тем пройдено: ${state.completedTopics.length}/${CURRICULUM.length}`, 20, 55);
+      doc.text(`Тем пройдено: ${state.exploredTopics.length}`, 20, 55);
       doc.text(`Режим: ${state.isOffline?'Офлайн':'Groq AI'}`, 20, 65);
       doc.text('🎯 Рекомендации:', 20, 85);
-      doc.text(state.progress<30?'• Фокус на алфавите и базовых фразах':'• Практикуйте падежи в диалогах', 25, 95);
-      doc.text('• Повторяйте слабые места через 1, 3, 7 дней', 25, 105);
-      doc.text('• Говорите вслух 5 мин/день', 25, 115);
+      doc.text('• Повторяйте слабые места через 1, 3, 7 дней', 25, 95);
+      doc.text('• Пишите короткие тексты ежедневно', 25, 105);
+      doc.text('• Используйте "Углубить" для нюансов', 25, 115);
       doc.save(`rusmaster-pro-${new Date().toISOString().slice(0,10)}.pdf`);
     };
-    window.resetProgress = () => { if(confirm('Сбросить всё?')) { localStorage.removeItem('rusmaster_pro_v1'); location.reload(); } };
+    window.resetProgress = () => { if(confirm('Сбросить всё?')) { localStorage.removeItem('rusmaster_pro_v2'); location.reload(); } };
 
     // === PWA ===
     if('serviceWorker' in navigator) {
