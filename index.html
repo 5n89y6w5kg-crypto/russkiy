@@ -1,605 +1,686 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0B1120">
-  <title>RUSMASTER PRO</title>
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUlVTTEFTVEVSIFBSTyIsInNob3J0X25hbWUiOiJSVVNNQVNURVIiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBCMTEyMCIsInRoZW1lX2NvbG9yIjoiIzBCMTEyMCJ9">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <style>
-    :root{--bg:#0B1120;--card:#151E32;--accent:#3B82F6;--success:#10B981;--warn:#F59E0B;--error:#EF4444;--ai:#8B5CF6;--text:#F8FAFC;--muted:#94A3B8;--radius:14px;--shadow:0 6px 16px rgba(0,0,0,0.35);--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
-    *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font);-webkit-tap-highlight-color:transparent}
-    body{background:var(--bg);color:var(--text);padding:16px;max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-    .header{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:12px}
-    .header h1{font-size:18px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--ai));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .streak{background:var(--card);padding:6px 10px;border-radius:16px;font-size:12px;display:flex;align-items:center;gap:4px}
-    .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
-    .tabs::-webkit-scrollbar{display:none}
-    .tab{padding:8px 12px;border-radius:20px;background:var(--card);color:var(--muted);white-space:nowrap;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;border:1px solid transparent}
-    .tab.active{background:var(--accent);color:white;border-color:rgba(255,255,255,0.1)}
-    .screen{display:none;flex:1;flex-direction:column;gap:12px}
-    .screen.active{display:flex}
-    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid #1E293B}
-    .card h2{font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .card p{color:var(--muted);line-height:1.4;font-size:13px;margin-bottom:8px}
-    .btn{width:100%;padding:12px;border:none;border-radius:10px;background:var(--accent);color:white;font-size:14px;font-weight:600;cursor:pointer;transition:transform .1s}
-    .btn:active{transform:scale(0.98)}
-    .btn-outline{background:transparent;border:1.5px solid var(--muted);color:var(--text)}
-    .btn-warn{background:var(--warn);color:#0B1120}
-    .ai-chat{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-right:4px;min-height:280px}
-    .msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.35;animation:fadeUp .25s ease}
-    .msg.user{align-self:flex-end;background:var(--accent);color:white;border-bottom-right-radius:4px}
-    .msg.ai{align-self:flex-start;background:var(--card);border:1px solid #334155;border-bottom-left-radius:4px}
-    .msg.ai strong{color:var(--ai)}
-    .input-area{display:flex;gap:6px;margin-top:6px}
-    .input-field{flex:1;padding:10px;border:1.5px solid #334155;border-radius:8px;background:#0F172A;color:var(--text);font-size:14px;outline:none;transition:border .2s}
-    .input-field:focus{border-color:var(--accent)}
-    textarea.input-field{min-height:100px;resize:vertical;line-height:1.4}
-    .progress-ring{width:56px;height:56px;position:relative;margin:0 auto 12px}
-    .progress-ring svg{transform:rotate(-90deg)}
-    .progress-bg{fill:none;stroke:#334155;stroke-width:5}
-    .progress-fill{fill:none;stroke:var(--success);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .4s}
-    .progress-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:700}
-    .tag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#1E293B;color:var(--muted);margin-right:4px;cursor:pointer;transition:all .15s}
-    .tag:hover{background:#334155}
-    .tag.strong{background:#064E3B;color:#6EE7B7}
-    .tag.critical{background:#7F1D1D;color:#FCA5A5}
-    .typing{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:pulse 1s infinite;margin:0 2px}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-    .loader{display:inline-block;width:18px;height:18px;border:2px solid #334155;border-top:2px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
-    
-    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
-    .modal{background:var(--card);padding:20px;border-radius:var(--radius);width:100%;max-width:380px;box-shadow:var(--shadow)}
-    .modal h2{margin-bottom:8px;font-size:16px}
-    .modal p{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.4}
-    .modal .input-field{margin-bottom:8px}
-    .modal .btn{margin-bottom:6px}
-    .modal .btn-outline{font-size:12px;padding:8px}
-    .error-msg{color:var(--error);font-size:11px;margin-top:4px;display:none}
-    
-    .lesson-section{margin-bottom:14px}
-    .lesson-section h3{font-size:14px;margin-bottom:6px;color:var(--accent)}
-    .example{background:#0F172A;padding:10px;border-radius:8px;margin:6px 0;font-size:13px}
-    .example .ru{font-weight:600}
-    .example .note{color:var(--warn);font-size:11px;margin-top:4px}
-    .mistake{background:#1C0F11;padding:8px;border-radius:6px;margin:4px 0;font-size:12px;border-left:2px solid var(--error)}
-    .exercise-item{background:#0F172A;padding:10px;border-radius:8px;margin:8px 0}
-    .exercise-item .q{margin-bottom:6px}
-    .exercise-item input{width:100%;padding:8px;background:#1E293B;border:1px solid #334155;border-radius:6px;color:white}
-    .exercise-item .feedback{margin-top:6px;font-size:12px;min-height:16px}
-    .result-box{background:#0F172A;padding:14px;border-radius:10px;margin-top:10px;line-height:1.5;font-size:13px;max-height:300px;overflow-y:auto}
-    .result-box .correct{color:var(--success);font-weight:600}
-    .result-box .err{color:var(--error);text-decoration:line-through}
-
-    /* QUIZ STYLES */
-    .quiz-card{background:#0F172A;padding:14px;border-radius:10px;margin:8px 0}
-    .quiz-q{font-weight:600;margin-bottom:10px}
-    .quiz-opts{display:grid;gap:6px}
-    .quiz-opt{padding:10px;background:#1E293B;border:1.5px solid #334155;border-radius:8px;cursor:pointer;transition:all .15s}
-    .quiz-opt:hover{background:#334155}
-    .quiz-opt.selected{border-color:var(--accent);background:rgba(59,130,246,0.1)}
-    .quiz-opt.correct{border-color:var(--success);background:rgba(16,185,129,0.1)}
-    .quiz-opt.wrong{border-color:var(--error);background:rgba(239,68,68,0.1)}
-    .quiz-expl{margin-top:8px;font-size:12px;color:var(--muted);padding:8px;background:rgba(245,158,11,0.1);border-radius:6px;border-left:3px solid var(--warn);display:none}
-    
-    @media(max-width:360px){.tabs{gap:4px}.tab{padding:7px 10px;font-size:12px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#060B14">
+<title>RUSMASTER PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060B14;--bg2:#0D1526;--card:#111D33;--card2:#162038;
+  --accent:#00D4FF;--accent2:#0098CC;--gold:#FFD700;--gold2:#FFA500;
+  --success:#00E676;--warn:#FFB300;--error:#FF4757;--ai:#BF5FFF;
+  --text:#EEF2FF;--muted:#7A8BAA;--border:#1E2D4A;
+  --r:16px;--font-h:'Unbounded',sans-serif;--font-b:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;padding-bottom:85px}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,0.06),transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(191,95,255,0.05),transparent 60%);
+  pointer-events:none;z-index:0}
+.wrap{max-width:480px;margin:0 auto;padding:0 14px;position:relative;z-index:1}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 0 10px}
+.hdr-logo{font-family:var(--font-h);font-size:14px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--ai));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-logo span{-webkit-text-fill-color:var(--gold)}
+.hdr-right{display:flex;gap:7px;align-items:center}
+.streak-badge{background:linear-gradient(135deg,#FF6B00,#FFD700);color:#000;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-h)}
+.level-badge{background:var(--card2);border:1px solid var(--border);color:var(--accent);padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer}
+.xp-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--font-h)}
+.xp-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ai));border-radius:2px;transition:width .5s}
+.screen{display:none;flex-direction:column;gap:12px}
+.screen.active{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--r);padding:16px;border:1px solid var(--border);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.35}
+.card-title{font-family:var(--font-h);font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.card p{color:var(--muted);font-size:12px;line-height:1.5;margin-bottom:8px}
+.hero-card{background:linear-gradient(135deg,#0D1B35,#162038,#0D1B35);border:1px solid rgba(0,212,255,0.2);padding:20px;border-radius:var(--r);text-align:center}
+.hero-ring{position:relative;width:90px;height:90px;margin:0 auto 14px}
+.hero-ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:6}
+.ring-fill{fill:none;stroke:url(#rg);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s}
+.ring-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-h);font-size:18px;font-weight:900;color:var(--accent)}
+.hero-title{font-family:var(--font-h);font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.hero-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:transform .12s;font-family:var(--font-h)}
+.btn:active{transform:scale(0.97)}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;box-shadow:0 0 20px rgba(0,212,255,0.3)}
+.btn-g{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
+.btn-ai{background:linear-gradient(135deg,var(--ai),#8830DD);color:#fff}
+.btn-out{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-red{background:linear-gradient(135deg,var(--error),#CC0000);color:#fff}
+.btn-sm{padding:8px 12px;font-size:11px;width:auto}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.method-card{background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.method-card.active{border-color:var(--accent);background:rgba(0,212,255,0.07)}
+.method-icon{font-size:24px;margin-bottom:5px}
+.method-name{font-family:var(--font-h);font-size:10px;font-weight:700;margin-bottom:2px}
+.method-desc{font-size:9px;color:var(--muted);line-height:1.3}
+.mod-group{margin-bottom:12px}
+.mod-hdr{font-family:var(--font-h);font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.topic-btn{width:100%;text-align:left;padding:11px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:12px;font-family:var(--font-b);font-weight:600;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;transition:all .12s}
+.topic-btn:active{transform:scale(0.98)}
+.topic-btn.done{background:rgba(0,230,118,0.07);border-color:rgba(0,230,118,0.3);color:var(--success)}
+.topic-btn.weak{background:rgba(255,71,87,0.05);border-color:rgba(255,71,87,0.2)}
+.diff-badge{padding:3px 7px;border-radius:20px;font-size:9px;font-weight:700;font-family:var(--font-h)}
+.diff-a1{background:rgba(0,230,118,0.15);color:var(--success)}
+.diff-a2{background:rgba(0,212,255,0.15);color:var(--accent)}
+.diff-b1{background:rgba(255,179,0,0.15);color:var(--warn)}
+.diff-b2{background:rgba(255,71,87,0.15);color:var(--error)}
+.diff-c1{background:rgba(191,95,255,0.15);color:var(--ai)}
+.les-nav{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-h);font-size:10px;color:var(--muted);margin-bottom:12px}
+.les-nav button{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700}
+.les-sec{margin-bottom:16px}
+.les-h{font-family:var(--font-h);font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.les-h::after{content:'';flex:1;height:1px;background:var(--border)}
+.les-txt{font-size:13px;line-height:1.65;color:var(--text)}
+.ex-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:6px 0}
+.ex-ru{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ex-note{font-size:11px;color:var(--warn);margin-top:5px;padding:4px 8px;background:rgba(255,179,0,0.08);border-radius:6px;display:inline-block}
+.err-box{background:rgba(255,71,87,0.06);border-left:3px solid var(--error);border-radius:0 8px 8px 0;padding:10px;margin:5px 0;font-size:12px}
+.err-wrong{color:var(--error);text-decoration:line-through;font-size:11px}
+.err-right{color:var(--success);font-weight:700;margin:3px 0}
+.err-why{color:var(--muted);font-size:11px}
+.g-tag{display:inline-block;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:var(--accent);padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;margin:3px 2px;font-family:var(--font-h)}
+.ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0}
+.ex-q{font-size:13px;font-weight:600;margin-bottom:10px;line-height:1.4}
+.ex-inp{width:100%;padding:10px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;transition:border .2s}
+.ex-inp:focus{border-color:var(--accent)}
+.ex-inp.ok{border-color:var(--success);background:rgba(0,230,118,0.05)}
+.ex-inp.no{border-color:var(--error);background:rgba(255,71,87,0.05)}
+.ex-feed{font-size:12px;margin-top:7px;min-height:16px;line-height:1.5}
+.chk-btn{margin-top:8px;padding:8px 16px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-h)}
+.quiz-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin:8px 0}
+.quiz-q{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.5}
+.quiz-opts{display:grid;gap:8px}
+.quiz-opt{padding:12px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--font-b);font-weight:600;color:var(--text);width:100%}
+.quiz-opt:active{transform:scale(0.98)}
+.quiz-opt.sel-ok{border-color:var(--success)!important;background:rgba(0,230,118,0.12)!important;color:var(--success)!important}
+.quiz-opt.sel-no{border-color:var(--error)!important;background:rgba(255,71,87,0.12)!important;color:var(--error)!important}
+.quiz-opt.reveal-ok{border-color:var(--success)!important;background:rgba(0,230,118,0.07)!important;color:var(--success)!important}
+.quiz-opt:disabled{cursor:default}
+.quiz-expl{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5;padding:10px;background:rgba(255,179,0,0.06);border-radius:8px;border-left:3px solid var(--warn)}
+.quiz-prog{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ai));border-radius:2px;transition:width .4s}
+.quiz-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;font-family:var(--font-h)}
+.sr-box{background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,165,0,0.04));border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:14px}
+.sr-num{font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--gold);text-align:center}
+.sr-lbl{text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px}
+.fc{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:var(--r);padding:30px 20px;text-align:center;min-height:160px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;position:relative}
+.fc::after{content:'нажмите чтобы перевернуть';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);font-family:var(--font-h)}
+.fc-f{font-size:28px;font-weight:700;font-family:var(--font-h)}
+.fc-b{font-size:16px;color:var(--success);font-weight:600;display:none}
+.fc-c{font-size:11px;color:var(--muted);margin-top:8px}
+.fc-ctrl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.fc-btn{padding:10px;border-radius:10px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-h)}
+.fc-easy{background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3)}
+.fc-hard{background:rgba(255,179,0,0.15);color:var(--warn);border:1px solid rgba(255,179,0,0.3)}
+.fc-again{background:rgba(255,71,87,0.15);color:var(--error);border:1px solid rgba(255,71,87,0.3)}
+textarea.t-inp{width:100%;min-height:100px;padding:12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;resize:vertical;line-height:1.5;transition:border .2s}
+textarea.t-inp:focus{border-color:var(--accent)}
+.res-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;font-size:13px;line-height:1.6;max-height:400px;overflow-y:auto}
+.chat-w{display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:260px;max-height:45vh}
+.msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;animation:fadeIn .2s}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:600;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--card2);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg.ai strong{color:var(--ai)}
+.chat-row{display:flex;gap:6px;margin-top:8px}
+.chat-inp{flex:1;padding:10px 14px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none}
+.chat-inp:focus{border-color:var(--accent)}
+.send-btn{padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#000;font-size:16px;cursor:pointer;font-weight:900}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.stat-num{font-family:var(--font-h);font-size:24px;font-weight:900;color:var(--accent)}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-h)}
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:8px 0}
+.hc{aspect-ratio:1;border-radius:3px;background:var(--border)}
+.hc.l1{background:rgba(0,212,255,0.2)}.hc.l2{background:rgba(0,212,255,0.45)}
+.hc.l3{background:rgba(0,212,255,0.7)}.hc.l4{background:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:390px;padding:22px;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--ai))}
+.modal-title{font-family:var(--font-h);font-size:14px;font-weight:900;margin-bottom:8px}
+.modal-sub{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:14px}
+.modal-inp{width:100%;padding:11px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;margin-bottom:8px}
+.modal-inp:focus{border-color:var(--accent)}
+.modal-err{color:var(--error);font-size:11px;margin-bottom:8px;display:none}
+.lv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.lv-opt{padding:10px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .15s}
+.lv-opt.sel{border-color:var(--accent);background:rgba(0,212,255,0.1);color:var(--accent)}
+.lv-opt-n{font-family:var(--font-h);font-size:12px;font-weight:700}
+.lv-opt-d{font-size:10px;color:var(--muted);margin-top:2px}
+.bot-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,11,20,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 14px;z-index:100}
+.nav-i{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 8px;border-radius:10px;flex:1;transition:all .15s}
+.nav-i.active{background:rgba(0,212,255,0.1)}
+.nav-icon{font-size:19px}
+.nav-lbl{font-size:9px;font-family:var(--font-h);color:var(--muted);font-weight:700;letter-spacing:.3px}
+.nav-i.active .nav-lbl{color:var(--accent)}
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:10px 0}
+.t-tag{display:inline-block;padding:5px 10px;background:var(--card2);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;margin:3px 2px;transition:all .15s}
+.t-tag:active{background:rgba(0,212,255,0.1);border-color:var(--accent)}
+.t-tag.weak{border-color:rgba(255,71,87,0.3);color:var(--error)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.spin-sm{width:12px;height:12px;border-width:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.td{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:tdot 1.2s infinite;margin:0 2px}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,100%{opacity:1}50%{opacity:.2}}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:700;font-family:var(--font-h);z-index:99999;transition:transform .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--success);color:var(--success)}
+.toast.xp{border-color:var(--gold);color:var(--gold)}
+.explore-inp{width:100%;padding:13px 16px;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-family:var(--font-b);outline:none;margin-bottom:8px;transition:border .2s}
+.explore-inp:focus{border-color:var(--accent)}
+.rel-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.quiz-result-score{font-family:var(--font-h);font-size:52px;font-weight:900;text-align:center;color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,0.4)}
+</style>
 </head>
 <body>
-  <div class="header">
-    <h1>🇷🇺 RUSMASTER PRO</h1>
-    <div class="streak">🔥 <span id="streak-val">0</span> дн.</div>
-  </div>
+<div class="wrap">
 
-  <div class="tabs">
-    <div class="tab active" data-screen="home">🏠 Старт</div>
-    <div class="tab" data-screen="explore">🔍 Поиск</div>
-    <div class="tab" data-screen="quiz">🎯 Тест</div>
-    <div class="tab" data-screen="textcheck">📝 Текст</div>
-    <div class="tab" data-screen="ai">🤖 Чат</div>
-    <div class="tab" data-screen="progress">📊 Прогресс</div>
+<div class="hdr">
+  <div class="hdr-logo">🇷🇺 RUSMASTER<span>PRO</span></div>
+  <div class="hdr-right">
+    <div class="level-badge" onclick="openModal('modal-level')" id="level-badge">A1</div>
+    <div class="streak-badge">🔥 <span id="streak-val">0</span></div>
   </div>
+</div>
+<div class="xp-row"><span>XP: <span id="xp-val">0</span></span><span>До уровня: <span id="xp-next">100</span></span></div>
+<div class="xp-bar"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
 
-  <div id="home" class="screen active">
-    <div class="card">
-      <h2>🌐 Безлимитное изучение</h2>
-      <p>Введите любую тему: грамматику, стилистику, фразеологию, деловой русский, исторические формы, диалекты, нюансы ударений и т.д. AI сгенерирует полный урок за секунды.</p>
-      <div class="progress-ring">
-        <svg width="56" height="56" viewBox="0 0 56 56">
-          <circle class="progress-bg" cx="28" cy="28" r="24"/>
-          <circle class="progress-fill" cx="28" cy="28" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8" id="ring-progress"/>
-        </svg>
-        <div class="progress-text" id="home-percent">0%</div>
+<!-- HOME -->
+<div id="scr-home" class="screen active">
+  <div class="hero-card">
+    <div class="hero-ring">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#BF5FFF"/>
+        </linearGradient></defs>
+        <circle class="ring-bg" cx="45" cy="45" r="38"/>
+        <circle class="ring-fill" cx="45" cy="45" r="38" stroke-dasharray="238.8" stroke-dashoffset="238.8" id="ring-prog"/>
+      </svg>
+      <div class="ring-pct" id="home-pct">0%</div>
+    </div>
+    <div class="hero-title">Ваш прогресс</div>
+    <div class="hero-sub" id="hero-sub">Начните первый урок прямо сейчас</div>
+    <button class="btn btn-g" onclick="startTodaySession()">▶ НАЧАТЬ</button>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ МЕТОДИКА</div>
+    <div class="method-grid">
+      <div class="method-card active" id="m-spaced" onclick="setMethod('spaced')">
+        <div class="method-icon">🧠</div>
+        <div class="method-name">ПОВТОРЕНИЕ</div>
+        <div class="method-desc">Интервальное — в 5 раз быстрее</div>
       </div>
-      <button class="btn" onclick="goExplore()">🔍 Начать исследование</button>
-    </div>
-    <div class="card">
-      <h2>📅 План на сегодня</h2>
-      <ul style="padding-left:16px;color:var(--muted);line-height:1.5;font-size:12px" id="daily-plan"><li>Загрузка...</li></ul>
-    </div>
-    <div class="card">
-      <h2>🎯 Ежедневный тест</h2>
-      <p>AI подберёт 5-10 вопросов по вашим слабым местам. Несколько вариантов ответа, мгновенная проверка с объяснением.</p>
-      <button class="btn btn-ai" onclick="goQuiz()">🚀 Пройти тест</button>
-    </div>
-  </div>
-
-  <div id="explore" class="screen">
-    <div class="card">
-      <h2>🔍 Динамический поиск</h2>
-      <p>Введите тему на любом уровне детализации. AI найдёт, структурирует и объяснит.</p>
-      <input class="input-field" id="topic-input" placeholder="Напр: Винительный падеж после числительных, Оттенки значения глагола 'ставить', Разговорные сокращения...">
-      <button class="btn" style="margin-top:6px" onclick="searchTopic()">🔎 Сгенерировать урок</button>
-      <div id="topic-history" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px"></div>
-    </div>
-  </div>
-
-  <div id="lesson" class="screen">
-    <div class="card">
-      <h2 id="lesson-title">Урок</h2>
-      <div id="lesson-content" style="min-height:280px"></div>
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-        <button class="btn btn-outline" onclick="prevTopic()">◀ Назад</button>
-        <button class="btn" onclick="exploreDeeper()">🔍 Углубить</button>
-        <button class="btn" style="background:var(--ai)" onclick="goExplore()">📚 Новая тема</button>
+      <div class="method-card" id="m-immersion" onclick="setMethod('immersion')">
+        <div class="method-icon">🌊</div>
+        <div class="method-name">ПОГРУЖЕНИЕ</div>
+        <div class="method-desc">Только русский — мышление на языке</div>
+      </div>
+      <div class="method-card" id="m-chunks" onclick="setMethod('chunks')">
+        <div class="method-icon">🧩</div>
+        <div class="method-name">ФРАЗЫ</div>
+        <div class="method-desc">Готовые речевые блоки</div>
+      </div>
+      <div class="method-card" id="m-shadowing" onclick="setMethod('shadowing')">
+        <div class="method-icon">🗣️</div>
+        <div class="method-name">ТЕНЕВОЙ ПОВТОР</div>
+        <div class="method-desc">Произношение как у носителя</div>
       </div>
     </div>
+    <button class="btn btn-p" onclick="startTodaySession()">🚀 СЕГОДНЯШНЯЯ СЕССИЯ</button>
   </div>
-
-  <div id="quiz" class="screen">
-    <div class="card">
-      <h2>🎯 Ежедневный тест</h2>
-      <p id="quiz-desc">AI подберёт вопросы по вашим слабым местам. Выберите правильный вариант.</p>
-      <div id="quiz-container" style="margin-top:12px"></div>
-      <div id="quiz-result" style="margin-top:12px;display:none"></div>
-      <button class="btn" id="quiz-submit" onclick="submitQuiz()" style="display:none;margin-top:12px">✅ Проверить ответы</button>
-      <button class="btn btn-outline" onclick="generateNewQuiz()" style="margin-top:8px">🔄 Новые вопросы</button>
+  <div class="card">
+    <div class="card-title">📅 ПЛАН НА СЕГОДНЯ</div>
+    <ul id="daily-plan" style="padding-left:18px;color:var(--muted);line-height:1.9;font-size:12px"></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 ПОВТОРЕНИЕ</div>
+    <div class="sr-box">
+      <div class="sr-num" id="sr-count">0</div>
+      <div class="sr-lbl">карточек ждут повторения</div>
+      <button class="btn btn-g" onclick="startFlashcards()" id="sr-btn" style="display:none;margin-top:8px">Повторить →</button>
     </div>
   </div>
+  <div class="card">
+    <div class="card-title">🎯 ЕЖЕДНЕВНЫЙ ТЕСТ</div>
+    <p>AI подберёт 10 вопросов по вашим слабым местам для закрепления материала.</p>
+    <button class="btn btn-ai" onclick="goScreen('scr-quiz');setNav('nav-quiz');loadDailyQuiz()">🎯 Пройти тест</button>
+  </div>
+</div>
 
-  <div id="textcheck" class="screen">
-    <div class="card">
-      <h2>📝 Проверка текста</h2>
-      <p>Вставьте любой объём. AI исправит орфографию, грамматику, пунктуацию, стилистику и объяснит каждую правку.</p>
-      <textarea class="input-field" id="text-input" placeholder="Ваш текст..."></textarea>
-      <button class="btn" id="check-btn" onclick="checkLongText()">🔍 Анализировать</button>
-      <div id="text-result" class="result-box" style="display:none"></div>
+<!-- LEARN -->
+<div id="scr-learn" class="screen">
+  <div class="card">
+    <div class="card-title">🔍 ЛЮБАЯ ТЕМА</div>
+    <input class="explore-inp" id="free-topic" placeholder="Например: винительный падеж, глаголы движения, деловая лексика...">
+    <button class="btn btn-p" onclick="loadFreeTopic()">🤖 AI: Создать урок</button>
+  </div>
+  <div class="card" style="padding:12px">
+    <div class="card-title">📚 ПРОГРАММА КУРСА</div>
+    <div id="curriculum-list"></div>
+  </div>
+</div>
+
+<!-- LESSON -->
+<div id="scr-lesson" class="screen">
+  <div class="les-nav">
+    <button onclick="goBack()">◀ Назад</button>
+    <span id="les-pos">1/32</span>
+    <button onclick="nextLesson()">Далее ▶</button>
+  </div>
+  <div class="card">
+    <div id="les-title" class="card-title"></div>
+    <div id="les-content"></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-out" style="flex:1" onclick="goBack()">◀ Назад</button>
+    <button class="btn btn-p" style="flex:2" onclick="nextLesson()">Следующий урок ▶</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="scr-quiz" class="screen">
+  <div class="card">
+    <div class="card-title">🎯 ЕЖЕДНЕВНЫЙ ТЕСТ</div>
+    <div id="quiz-cont">
+      <div style="text-align:center;padding:30px;color:var(--muted)">Загрузка теста...</div>
     </div>
   </div>
+</div>
 
-  <div id="ai" class="screen">
-    <div class="ai-chat" id="ai-chat">
-      <div class="msg ai"><strong>🤖 AI-Репетитор:</strong> Привет! Задавайте вопросы, просите примеры, уточняйте нюансы. Я объясню как профессор.</div>
+<!-- FLASHCARDS -->
+<div id="scr-flash" class="screen">
+  <div class="card">
+    <div class="card-title">🃏 ПОВТОРЕНИЕ КАРТОЧЕК</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;color:var(--muted)">Осталось: <strong id="fc-rem">0</strong></span>
+      <span style="font-size:11px;color:var(--success)">Верно: <strong id="fc-ok">0</strong></span>
+      <span style="font-size:11px;color:var(--error)">Повтор: <strong id="fc-ag">0</strong></span>
     </div>
-    <div class="input-area">
-      <input class="input-field" id="ai-input" placeholder="Вопрос или фраза...">
-      <button class="btn" style="width:auto;padding:9px 12px" onclick="sendToAI()">➤</button>
+    <div class="fc" id="fc-card" onclick="flipCard()">
+      <div class="fc-f" id="fc-f">—</div>
+      <div class="fc-b" id="fc-b"></div>
+      <div class="fc-c" id="fc-c"></div>
     </div>
-  </div>
-
-  <div id="progress" class="screen">
-    <div class="card">
-      <h2>📊 Аналитика</h2>
-      <div id="stats-container"></div>
-      <div style="display:flex;gap:6px;margin-top:10px">
-        <button class="btn btn-warn" onclick="resetProgress()">🔄 Сброс</button>
-        <button class="btn" onclick="exportPDF()">📄 PDF</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="api-modal">
-    <div class="modal">
-      <h2>🔑 Подключение AI</h2>
-      <p>Без ключа Groq система работает в ограниченном офлайн-режиме. С ключом — безлимитная генерация любых тем.</p>
-      <input class="input-field" id="api-key-input" placeholder="gsk_..." autocomplete="off">
-      <div class="error-msg" id="api-error"></div>
-      <button class="btn" onclick="validateKey()">✅ Проверить</button>
-      <button class="btn btn-outline" onclick="enterOfflineMode()">🌐 Офлайн</button>
+    <div class="fc-ctrl" id="fc-ctrl" style="display:none">
+      <button class="fc-btn fc-again" onclick="rateCard('again')">↩ Ещё раз</button>
+      <button class="fc-btn fc-hard" onclick="rateCard('hard')">😐 Сложно</button>
+      <button class="fc-btn fc-easy" onclick="rateCard('easy')">✅ Легко</button>
     </div>
   </div>
+</div>
 
-  <script>
-    // === STATE ===
-    const state = {
-      streak: 0, lastDate: null, progress: 0, exploredTopics: [], weakPoints: [], 
-      groqKey: localStorage.getItem('rusmaster_pro_key') || '', isOffline: false,
-      currentTopic: null, lessonCache: {}, history: [], level: 'A1',
-      quizHistory: [], quizLastDate: null, quizScore: 0
-    };
+<!-- TEXT CHECK -->
+<div id="scr-text" class="screen">
+  <div class="card">
+    <div class="card-title">📝 ПРОВЕРКА ТЕКСТА</div>
+    <p>Введите ваш текст. AI исправит ошибки и объяснит каждое правило.</p>
+    <textarea class="t-inp" id="text-inp" placeholder="Напишите текст на русском..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-p" id="chk-btn" onclick="checkText()" style="flex:2">🔍 Проверить</button>
+      <button class="btn btn-out" onclick="document.getElementById('text-inp').value=''" style="flex:1">Очистить</button>
+    </div>
+    <div id="text-result" class="res-box" style="display:none"></div>
+  </div>
+</div>
 
-    // === INIT ===
-    window.onload = async () => {
-      loadState();
-      if(!state.groqKey || state.groqKey.length < 15) document.getElementById('api-modal').style.display = 'flex';
-      else { const v = await testKey(state.groqKey); if(!v) showModalError('⚠️ Ключ недействителен.'); }
-      renderAll();
-    };
+<!-- CHAT -->
+<div id="scr-chat" class="screen">
+  <div class="card" style="flex:1">
+    <div class="card-title">🤖 AI-РЕПЕТИТОР</div>
+    <div class="chat-w" id="chat-w">
+      <div class="msg ai"><strong>🤖 AI:</strong> Здравствуйте! Я ваш персональный репетитор русского языка. Задавайте любые вопросы — о падежах, глаголах, произношении или фразах. Также могу проверить ваш текст.</div>
+    </div>
+    <div class="sep"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+      <span class="t-tag" onclick="quickAsk('Объясните падежи русского языка')">Падежи</span>
+      <span class="t-tag" onclick="quickAsk('В чём разница между НСВ и СВ?')">НСВ / СВ</span>
+      <span class="t-tag" onclick="quickAsk('Как образуется прошедшее время?')">Прошедшее время</span>
+      <span class="t-tag" onclick="quickAsk('Основные фразы для приветствия')">Приветствие</span>
+    </div>
+    <div class="chat-row">
+      <input class="chat-inp" id="chat-inp" placeholder="Вопрос или фраза...">
+      <button class="send-btn" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
 
-    const loadState = () => {
-      try { const s=localStorage.getItem('rusmaster_pro_v2'); if(s) Object.assign(state, JSON.parse(s)); } catch(e){}
-      if(!state.lastDate) state.lastDate = new Date().toISOString();
-      const today = new Date().toISOString().slice(0,10);
-      const last = state.lastDate.slice(0,10);
-      if(today !== last) {
-        const diff = Math.floor((new Date(today)-new Date(last))/864e5);
-        state.streak = diff===1 ? state.streak+1 : (diff>1 ? 1 : state.streak);
-        state.lastDate = new Date().toISOString();
-        // Reset quiz daily
-        if(state.quizLastDate !== today) { state.quizDoneToday = false; state.quizLastDate = today; }
-      }
-      saveState();
-    };
-    const saveState = () => {
-      if(Object.keys(state.lessonCache).length > 15) {
-        const keys = Object.keys(state.lessonCache);
-        keys.slice(0, keys.length-15).forEach(k => delete state.lessonCache[k]);
-      }
-      localStorage.setItem('rusmaster_pro_v2', JSON.stringify(state));
-    };
+<!-- PROGRESS -->
+<div id="scr-progress" class="screen">
+  <div class="card">
+    <div class="card-title">📊 АНАЛИТИКА</div>
+    <div class="stat-grid" id="stat-grid"></div>
+    <div class="card-title" style="margin-top:4px">📅 Активность (28 дней)</div>
+    <div class="heatmap" id="heatmap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚠️ СЛАБЫЕ МЕСТА</div>
+    <div id="weak-list" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚙️ НАСТРОЙКИ</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-out btn-sm" onclick="openModal('modal-api')">🔑 API-ключ</button>
+      <button class="btn btn-out btn-sm" onclick="openModal('modal-level')">📊 Уровень</button>
+      <button class="btn btn-out btn-sm" onclick="exportReport()">📄 Отчёт</button>
+      <button class="btn btn-red btn-sm" onclick="resetAll()">🔄 Сброс</button>
+    </div>
+  </div>
+</div>
 
-    // === API ===
-    async function testKey(key) {
-      try {
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method:'POST', headers:{'Authorization':`Bearer ${key}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'user',content:'ping'}], max_tokens:1})
-        });
-        return r.status===200;
-      } catch(e){return false;}
-    }
+</div><!-- /wrap -->
 
-    window.validateKey = async () => {
-      const key = document.getElementById('api-key-input').value.trim();
-      if(!key || key.length<10) return showModalError('⚠️ Введите корректный ключ.');
-      const btn = document.querySelector('#api-modal .btn'); btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
-      const valid = await testKey(key);
-      if(valid) { state.groqKey=key; localStorage.setItem('rusmaster_pro_key', key); document.getElementById('api-modal').style.display='none'; renderAll(); }
-      else showModalError('❌ Ключ недействителен.');
-      btn.innerHTML='✅ Проверить'; btn.disabled=false;
-    };
-    window.enterOfflineMode = () => { state.isOffline=true; document.getElementById('api-modal').style.display='none'; alert('🌐 Офлайн: базовые правила доступны. Для безлимита добавьте ключ.'); renderAll(); };
-    function showModalError(m){ document.getElementById('api-error').textContent=m; document.getElementById('api-error').style.display='block'; }
+<!-- BOTTOM NAV -->
+<div class="bot-nav">
+  <div class="nav-i active" id="nav-home" onclick="goScreen('scr-home');setNav('nav-home')">
+    <div class="nav-icon">🏠</div><div class="nav-lbl">СТАРТ</div>
+  </div>
+  <div class="nav-i" id="nav-learn" onclick="goScreen('scr-learn');setNav('nav-learn');renderCurriculum()">
+    <div class="nav-icon">📚</div><div class="nav-lbl">КУРС</div>
+  </div>
+  <div class="nav-i" id="nav-quiz" onclick="goScreen('scr-quiz');setNav('nav-quiz');loadDailyQuiz()">
+    <div class="nav-icon">🎯</div><div class="nav-lbl">ТЕСТ</div>
+  </div>
+  <div class="nav-i" id="nav-text" onclick="goScreen('scr-text');setNav('nav-text')">
+    <div class="nav-icon">📝</div><div class="nav-lbl">ТЕКСТ</div>
+  </div>
+  <div class="nav-i" id="nav-chat" onclick="goScreen('scr-chat');setNav('nav-chat')">
+    <div class="nav-icon">🤖</div><div class="nav-lbl">AI</div>
+  </div>
+  <div class="nav-i" id="nav-prog" onclick="goScreen('scr-progress');setNav('nav-prog')">
+    <div class="nav-icon">📊</div><div class="nav-lbl">ПРОГРЕСС</div>
+  </div>
+</div>
 
-    // === NAV ===
-    document.querySelectorAll('.tab').forEach(t=>{
-      t.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
-        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-        document.getElementById(t.dataset.screen).classList.add('active');
+<!-- MODAL API -->
+<div class="overlay" id="modal-api" style="display:none">
+  <div class="modal">
+    <div class="modal-title">🔑 ПОДКЛЮЧЕНИЕ AI</div>
+    <div class="modal-sub">Используйте бесплатный ключ <strong style="color:var(--accent)">Groq</strong> для полной функциональности.<br><br>
+      📋 Как получить:<br>
+      1. Перейдите на <strong>console.groq.com</strong><br>
+      2. API Keys → Create API Key<br>
+      3. Скопируйте ключ <strong>gsk_...</strong><br><br>
+      <span style="color:var(--warn)">⚠️ Ключи Anthropic (sk-ant-...) не работают из браузера.</span>
+    </div>
+    <input class="modal-inp" id="api-inp" placeholder="gsk_xxxxxxxxxxxx (Groq)" type="password" autocomplete="off">
+    <div class="modal-err" id="api-err"></div>
+    <button class="btn btn-p" onclick="validateKey()" style="margin-bottom:8px">✅ Подключить</button>
+    <button class="btn btn-out" onclick="enterOffline()" style="font-size:11px;padding:9px">🌐 Офлайн-режим</button>
+  </div>
+</div>
+
+<!-- MODAL LEVEL -->
+<div class="overlay" id="modal-level" style="display:none">
+  <div class="modal">
+    <div class="modal-title">📊 ВАШ УРОВЕНЬ</div>
+    <div class="modal-sub">Выберите ваш текущий уровень. AI адаптирует сложность материалов.</div>
+    <div class="lv-grid">
+      <div class="lv-opt" onclick="setLevel('A1')" id="lv-A1"><div class="lv-opt-n">A1</div><div class="lv-opt-d">Начальный</div></div>
+      <div class="lv-opt" onclick="setLevel('A2')" id="lv-A2"><div class="lv-opt-n">A2</div><div class="lv-opt-d">Элементарный</div></div>
+      <div class="lv-opt" onclick="setLevel('B1')" id="lv-B1"><div class="lv-opt-n">B1</div><div class="lv-opt-d">Средний</div></div>
+      <div class="lv-opt" onclick="setLevel('B2')" id="lv-B2"><div class="lv-opt-n">B2</div><div class="lv-opt-d">Выше среднего</div></div>
+      <div class="lv-opt" onclick="setLevel('C1')" id="lv-C1"><div class="lv-opt-n">C1</div><div class="lv-opt-d">Продвинутый</div></div>
+      <div class="lv-opt" onclick="setLevel('C2')" id="lv-C2"><div class="lv-opt-n">C2</div><div class="lv-opt-d">Владение</div></div>
+    </div>
+    <button class="btn btn-p" onclick="closeModal('modal-level')">Сохранить</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ═══ STATE ═══════════════════════════════════
+const S={
+  key:'',offline:false,level:'A1',
+  streak:0,lastDate:null,
+  xp:0,xpLevel:1,
+  progress:0,completed:[],weak:[],
+  method:'spaced',
+  lessonCache:{},history:[],
+  flashcards:[],fcQueue:[],fcIdx:0,fcFlipped:false,fcCorrect:0,fcAgain:0,
+  currentTopic:null,currentLessonIdx:0,
+  activityLog:{},
+  quizDoneToday:false,quizLastDate:null
+};
+
+// ═══ CURRICULUM ═══════════════════════════════
+const MODULES=[
+  {name:'ОСНОВЫ',topics:[
+    {id:'alphabet',t:'🔤 Алфавит и произношение',diff:'A1'},
+    {id:'stress',t:'🎵 Ударение и интонация',diff:'A1'},
+    {id:'reading',t:'📖 Чтение и транслитерация',diff:'A1'},
+  ]},
+  {name:'СУЩЕСТВИТЕЛЬНЫЕ',topics:[
+    {id:'gender',t:'🧬 Род существительных',diff:'A1'},
+    {id:'plural',t:'🔢 Множественное число',diff:'A1'},
+    {id:'diminutive',t:'🌸 Уменьшительно-ласкательные формы',diff:'A2'},
+  ]},
+  {name:'МЕСТОИМЕНИЯ',topics:[
+    {id:'pron_personal',t:'👤 Личные местоимения',diff:'A1'},
+    {id:'pron_possessive',t:'🔐 Притяжательные местоимения',diff:'A1'},
+    {id:'pron_reflexive',t:'🪞 Возвратные местоимения',diff:'B1'},
+  ]},
+  {name:'ГЛАГОЛЫ',topics:[
+    {id:'verb_present',t:'⏱ Настоящее время',diff:'A1'},
+    {id:'verb_past',t:'⏪ Прошедшее время',diff:'A1'},
+    {id:'verb_future',t:'⏩ Будущее время',diff:'A2'},
+    {id:'verb_aspect',t:'🔄 Вид глагола: НСВ/СВ',diff:'B1'},
+    {id:'verb_reflexive',t:'🔁 Возвратные глаголы -ся/-сь',diff:'B1'},
+    {id:'verb_motion',t:'🚶 Глаголы движения',diff:'B1'},
+    {id:'verb_imperative',t:'❗ Повелительное наклонение',diff:'A2'},
+    {id:'verb_conj1',t:'🔵 I спряжение',diff:'A1'},
+    {id:'verb_conj2',t:'🟡 II спряжение',diff:'A2'},
+  ]},
+  {name:'ПАДЕЖИ',topics:[
+    {id:'case_nom',t:'🗝️ Именительный падеж',diff:'A1'},
+    {id:'case_gen',t:'🗝️ Родительный падеж',diff:'A2'},
+    {id:'case_dat',t:'🗝️ Дательный падеж',diff:'A2'},
+    {id:'case_acc',t:'🗝️ Винительный падеж',diff:'A2'},
+    {id:'case_ins',t:'🗝️ Творительный падеж',diff:'B1'},
+    {id:'case_prep',t:'🗝️ Предложный падеж',diff:'A2'},
+    {id:'all_cases',t:'⚡ Все падежи: сводная таблица',diff:'B1'},
+  ]},
+  {name:'ПРИЛАГАТЕЛЬНЫЕ И НАРЕЧИЯ',topics:[
+    {id:'adj_agreement',t:'🎨 Согласование прилагательных',diff:'A2'},
+    {id:'comparative',t:'📈 Степени сравнения',diff:'B1'},
+    {id:'adverbs',t:'💨 Наречия и их образование',diff:'B1'},
+  ]},
+  {name:'ЧИСЛИТЕЛЬНЫЕ И ВРЕМЯ',topics:[
+    {id:'numbers',t:'🔢 Числительные',diff:'A2'},
+    {id:'time',t:'⏰ Время суток',diff:'A1'},
+    {id:'dates',t:'📅 Даты и месяцы',diff:'A2'},
+  ]},
+  {name:'ОБЩЕНИЕ',topics:[
+    {id:'greetings',t:'👋 Приветствие и прощание',diff:'A1'},
+    {id:'about_me',t:'🗣️ Рассказ о себе',diff:'A1'},
+    {id:'shopping',t:'🛒 Магазин и покупки',diff:'A2'},
+    {id:'transport',t:'🚌 Транспорт и дорога',diff:'A2'},
+    {id:'restaurant',t:'🍽️ В ресторане',diff:'A2'},
+    {id:'small_talk',t:'💬 Светская беседа',diff:'B1'},
+    {id:'phone',t:'📞 Телефонный разговор',diff:'B1'},
+    {id:'work',t:'💼 Деловые темы',diff:'B1'},
+  ]},
+];
+const ALL_TOPICS=MODULES.flatMap(m=>m.topics);
+
+// BASE FLASHCARDS
+const BASE_CARDS=[
+  {front:'Я',back:'Я',ctx:'Я студент'},
+  {front:'ты',back:'ты (неформально)',ctx:'Ты говоришь?'},
+  {front:'он/она',back:'он/она',ctx:'Он идёт'},
+  {front:'мы',back:'мы',ctx:'Мы учимся'},
+  {front:'вы',back:'вы (формально)',ctx:'Вы понимаете?'},
+  {front:'они',back:'они',ctx:'Они живут здесь'},
+  {front:'говорить',back:'говорить',ctx:'Я говорю по-русски'},
+  {front:'понимать',back:'понимать',ctx:'Я не понимаю'},
+  {front:'читать',back:'читать',ctx:'Он читает книгу'},
+  {front:'писать',back:'писать',ctx:'Она пишет письмо'},
+  {front:'хотеть',back:'хотеть',ctx:'Я хочу чай'},
+  {front:'мочь',back:'мочь',ctx:'Я могу помочь'},
+  {front:'идти',back:'идти (пешком)',ctx:'Я иду домой'},
+  {front:'жить',back:'жить',ctx:'Где ты живёшь?'},
+  {front:'любить',back:'любить',ctx:'Я люблю русский язык'},
+  {front:'Именительный',back:'Кто? Что?',ctx:'Книга лежит'},
+  {front:'Родительный',back:'Кого? Чего?',ctx:'Нет книги'},
+  {front:'Дательный',back:'Кому? Чему?',ctx:'Дать книгу'},
+  {front:'Винительный',back:'Кого? Что?',ctx:'Читать книгу'},
+  {front:'Творительный',back:'Кем? Чем?',ctx:'Писать ручкой'},
+  {front:'Предложный',back:'О ком? О чём?',ctx:'Думать о книге'},
+  {front:'НСВ',back:'Несовершенный вид — процесс',ctx:'Я читал'},
+  {front:'СВ',back:'Совершенный вид — результат',ctx:'Я прочитал'},
+  {front:'Спасибо',back:'Спасибо',ctx:'Большое спасибо'},
+  {front:'Пожалуйста',back:'Пожалуйста',ctx:'Скажите, пожалуйста'},
+  {front:'Здравствуйте',back:'Здравствуйте (формально)',ctx:'Здравствуйте, как вы?'},
+  {front:'Привет',back:'Привет (неформально)',ctx:'Привет, как дела?'},
+  {front:'До свидания',back:'До свидания',ctx:'До свидания!'},
+  {front:'Как тебя зовут?',back:'Как тебя зовут?',ctx:'Меня зовут Алексей.'},
+  {front:'Я из...',back:'Я из...',ctx:'Я из Москвы.'},
+];
+
+// ═══ INIT ════════════════════════════════════
+window.onload=()=>{
+  loadState();
+  const k=localStorage.getItem('rm_key')||'';
+  if(k&&k.length>10){S.key=k;S.offline=false;}
+  else document.getElementById('modal-api').style.display='flex';
+  renderAll();renderCurriculum();
+  document.getElementById('chat-inp')?.addEventListener('keypress',e=>{if(e.key==='Enter')sendChat();});
+  document.getElementById('free-topic')?.addEventListener('keypress',e=>{if(e.key==='Enter')loadFreeTopic();});
+};
+
+function loadState(){
+  try{const r=localStorage.getItem('rm_v4');if(r)Object.assign(S,JSON.parse(r));}catch(e){}
+  const today=new Date().toISOString().slice(0,10);
+  if(!S.lastDate)S.lastDate=today;
+  if(today!==S.lastDate){
+    const diff=Math.floor((new Date(today)-new Date(S.lastDate))/86400000);
+    S.streak=diff===1?S.streak+1:(diff>1?0:S.streak);
+    S.lastDate=today;
+  }
+  if(!S.flashcards||S.flashcards.length===0){
+    S.flashcards=BASE_CARDS.map(c=>({...c,interval:1,ease:2.5,nextReview:0,reps:0}));
+  }
+  if(S.quizLastDate!==new Date().toISOString().slice(0,10)){S.quizDoneToday=false;S.quizLastDate=new Date().toISOString().slice(0,10);}
+  saveState();
+}
+function saveState(){
+  const keys=Object.keys(S.lessonCache);
+  if(keys.length>20)keys.slice(0,keys.length-20).forEach(k=>delete S.lessonCache[k]);
+  try{localStorage.setItem('rm_v4',JSON.stringify(S));}catch(e){}
+}
+
+// ═══ NAV ═════════════════════════════════════
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo(0,0);
+}
+function setNav(id){
+  document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+function goBack(){goScreen('scr-learn');setNav('nav-learn');}
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+
+// ═══ API ═════════════════════════════════════
+async function callAI(sys,usr,maxTok=1500){
+  if(S.offline||!S.key)return null;
+  const k=S.key.trim();
+  try{
+    if(k.startsWith('gsk_')){
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:maxTok,temperature:0.1})
       });
-    });
-    window.goExplore = ()=>{ document.querySelector('[data-screen="explore"]').click(); renderHistory(); };
-    window.goQuiz = ()=>{ document.querySelector('[data-screen="quiz"]').click(); generateDailyQuiz(); };
-
-    // === DYNAMIC AI ENGINE ===
-    async function generateLesson(topic) {
-      const prompt = `Ты — профессор русского языка и лингвист. Создай ПОЛНЫЙ, СТРУКТУРИРОВАННЫЙ урок по теме: "${topic}".
-      Уровень ученика: ${state.level}.
-      Верни ТОЛЬКО валидный JSON без markdown:
-      {
-        "title": "Название урока",
-        "explanation": "Подробное, академическое, но понятное объяснение (3-4 абзаца). Включи правила, логику, исключения, исторический контекст если уместно.",
-        "grammar_focus": ["Ключевые правила или конструкции"],
-        "examples": [
-          {"ru":"Пример предложения на русском","note":"Грамматическое пояснение на русском"},
-          {"ru":"Ещё пример","note":"Пояснение"},
-          {"ru":"Третий пример","note":"Пояснение"}
-        ],
-        "exceptions": ["Важные исключения или нюансы"],
-        "common_mistakes": [
-          {"wrong":"Неверный вариант","correct":"Верный вариант","reason":"Почему это ошибка и как запомнить"}
-        ],
-        "practice": {
-          "type":"fill_gap",
-          "items":[
-            {"question":"Вставьте слово: Я ___ (читать) книгу каждый день.","answer":"читаю","hint":"Настоящее время, 1-е лицо"}
-          ]
-        },
-        "usage_context": "Где и как это используется в реальной речи/письме: быт, работа, литература, официальные документы",
-        "related_topics": ["3 смежные темы для углубления"]
-      }`;
-
-      if(state.isOffline || !state.groqKey) return getFallback(topic);
-
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Отвечай только валидным JSON без markdown.'},{role:'user',content:prompt}], max_tokens:1800, temperature:0.1})
-        });
-        const d = await res.json();
-        let raw = d.choices[0].message.content.replace(/^
-```json\s*/i,'').replace(/
-```$/,'').trim();
-        const start=raw.indexOf('{'), end=raw.lastIndexOf('}');
-        if(start!==-1&&end!==-1) raw=raw.slice(start,end+1);
-        return JSON.parse(raw);
-      } catch(e) { return getFallback(topic); }
+      if(!r.ok)return null;
+      const d=await r.json();
+      return d.choices?.[0]?.message?.content||null;
     }
-
-    function getFallback(t) {
-      return {
-        title: t,
-        explanation: 'В офлайн-режиме доступна базовая логика. Для полного разбора подключите ключ Groq. Тема требует анализа контекста и исключений.',
-        grammar_focus: ['Базовые правила'], examples: [{ru:'Пример', note:'AI генерирует при подключении'}],
-        exceptions: ['Зависит от контекста'], common_mistakes: [{wrong:'Ошибка', correct:'Верно', reason:'AI уточнит'}],
-        practice: {type:'fill_gap', items:[{question:'AI офлайн', answer:'активировать'}]},
-        usage_context: 'Используется в письменной и устной речи.', related_topics: ['Смежная тема 1', 'Смежная тема 2']
-      };
-    }
-
-    async function searchTopic() {
-      const inp = document.getElementById('topic-input');
-      const topic = inp.value.trim(); if(!topic) return;
-      inp.value = '';
-      
-      document.querySelector('[data-screen="lesson"]').click();
-      state.currentTopic = topic;
-      if(!state.history.includes(topic)) state.history.unshift(topic);
-      if(state.history.length>20) state.history.pop();
-      saveState();
-
-      const cont = document.getElementById('lesson-content');
-      const title = document.getElementById('lesson-title');
-      title.textContent = '⏳ Генерация...';
-      cont.innerHTML = '<div style="text-align:center;padding:20px"><span class="loader"></span> AI анализирует тему, собирает правила, исключения, примеры...</div>';
-
-      const cached = state.lessonCache[topic];
-      const lesson = cached || await generateLesson(topic);
-      if(!cached) { state.lessonCache[topic]=lesson; saveState(); }
-      renderLesson(lesson);
-      
-      if(!state.exploredTopics.includes(topic)) {
-        state.exploredTopics.push(topic);
-        state.progress = Math.min(100, state.progress + 3);
-        saveState();
-      }
-    }
-
-    function renderLesson(les) {
-      const cont = document.getElementById('lesson-content');
-      document.getElementById('lesson-title').textContent = les.title;
-      let html = `<div class="lesson-section"><p>${les.explanation.replace(/\n/g,'<br>')}</p></div>`;
-      if(les.grammar_focus?.length) html+=`<div class="lesson-section"><h3>📐 Фокус</h3><div style="display:flex;flex-wrap:wrap;gap:5px">${les.grammar_focus.map(g=>`<span class="tag">${g}</span>`).join('')}</div></div>`;
-      html += `<div class="lesson-section"><h3>💡 Примеры</h3>${les.examples.map(e=>`<div class="example"><div class="ru">${e.ru}</div><div class="note">📝 ${e.note}</div></div>`).join('')}</div>`;
-      if(les.exceptions?.length) html+=`<div class="lesson-section"><h3>⚠️ Исключения</h3><p style="font-size:12px;color:var(--warn)">${les.exceptions.join('; ')}</p></div>`;
-      html += `<div class="lesson-section"><h3>🚫 Частые ошибки</h3>${les.common_mistakes.map(m=>`<div class="mistake"><strong>${m.wrong}</strong> → <span class="correct">${m.correct}</span><br>${m.reason}</div>`).join('')}</div>`;
-      html += `<div class="lesson-section"><h3>✍️ Практика</h3><div id="exercises">${les.practice.items.map((ex,i)=>`<div class="exercise-item"><div class="q">${i+1}. ${ex.question}</div><input type="text" id="ans_${i}" placeholder="Ответ..."><div class="feedback" id="feed_${i}"></div><button class="btn btn-outline" style="margin-top:5px;padding:5px" onclick="checkAnswer(${i},'${ex.answer.replace(/'/g,"\\'")}')">Проверить</button></div>`).join('')}</div></div>`;
-      if(les.usage_context) html+=`<div class="lesson-section"><h3>🌍 Контекст</h3><p>${les.usage_context}</p></div>`;
-      if(les.related_topics?.length) html+=`<div class="lesson-section"><h3>🔗 Углубить</h3><div style="display:flex;flex-wrap:wrap;gap:5px">${les.related_topics.map(t=>`<span class="tag" onclick="quickSearch('${t.replace(/'/g,"\\'")}')">${t}</span>`).join('')}</div></div>`;
-      cont.innerHTML = html;
-    }
-
-    window.quickSearch = (t) => { document.getElementById('topic-input').value=t; searchTopic(); };
-    window.exploreDeeper = () => { quickSearch(`Углублённо: ${state.currentTopic}`); };
-    window.prevTopic = () => { if(state.history.length>1) { state.history.shift(); quickSearch(state.history[0]); } else goExplore(); };
-
-    window.checkAnswer = async (i, correct) => {
-      const user = document.getElementById(`ans_${i}`).value.trim();
-      const feed = document.getElementById(`feed_${i}`);
-      feed.innerHTML='<span class="loader" style="width:10px;height:10px"></span>';
-      if(user.toLowerCase()===correct.toLowerCase()) { feed.innerHTML='<span style="color:var(--success)">✅ Верно!</span>'; return; }
-      
-      if(!state.isOffline && state.groqKey) {
-        try {
-          const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-            body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Коротко объясни ошибку (1 предложение) на русском.'}], max_tokens:30})
-          });
-          const d = await r.json();
-          feed.innerHTML=`❌ Нет. ${d.choices[0].message.content} Верно: <strong>${correct}</strong>`;
-        } catch(e) { feed.innerHTML=`❌ Нет. Верно: <strong>${correct}</strong>`; }
-      } else feed.innerHTML=`❌ Нет. Верно: <strong>${correct}</strong>`;
-      if(state.currentTopic && !state.weakPoints.includes(state.currentTopic)) state.weakPoints.push(state.currentTopic);
-      saveState();
-    };
-
-    // === DAILY QUIZ GENERATOR ===
-    async function generateDailyQuiz() {
-      const cont = document.getElementById('quiz-container');
-      cont.innerHTML = '<div style="text-align:center;padding:20px"><span class="loader"></span> AI готовит тест...</div>';
-      document.getElementById('quiz-result').style.display = 'none';
-      document.getElementById('quiz-submit').style.display = 'none';
-
-      if(state.isOffline || !state.groqKey) {
-        cont.innerHTML = '<p style="color:var(--warn)">🌐 Офлайн-режим: тесты недоступны. Подключите ключ Groq для адаптивных вопросов.</p>';
-        return;
-      }
-
-      try {
-        const weak = state.weakPoints.length ? `Ученик испытывает сложности с: ${state.weakPoints.join(', ')}.` : '';
-        const prompt = `Создай ежедневный тест по русскому языку. Уровень: ${state.level}. ${weak}
-        Верни ТОЛЬКО валидный JSON массив из 5-7 вопросов:
-        [
-          {
-            "question": "Текст вопроса (может быть коротким предложением или текстом до 20 слов)",
-            "options": ["Вариант А", "Вариант Б", "Вариант В", "Вариант Г"],
-            "correct": 0,
-            "explanation": "Подробное объяснение правильного ответа на русском: почему этот вариант верен, а другие — нет. Включи правило или пример."
-          }
-        ]
-        Вопросы должны проверять: грамматику, орфографию, пунктуацию, лексику, стилистику. Чередуй типы: выбор окончания, предлога, падежа, вида глагола, порядка слов.`;
-
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Отвечай только валидным JSON массивом.'},{role:'user',content:prompt}], max_tokens:1500, temperature:0.2})
-        });
-        const d = await res.json();
-        let raw = d.choices[0].message.content.replace(/^
-```json\s*/i,'').replace(/
-```$/,'').trim();
-        const start=raw.indexOf('['), end=raw.lastIndexOf(']');
-        if(start!==-1&&end!==-1) raw=raw.slice(start,end+1);
-        const quiz = JSON.parse(raw);
-        renderQuiz(quiz);
-      } catch(e) {
-        cont.innerHTML = '<p style="color:var(--error)">⚠️ Ошибка генерации теста. Проверьте ключ или попробуйте позже.</p>';
-      }
-    }
-
-    function renderQuiz(quiz) {
-      const cont = document.getElementById('quiz-container');
-      let html = '';
-      quiz.forEach((q, idx) => {
-        html += `<div class="quiz-card" data-idx="${idx}">
-          <div class="quiz-q">${idx+1}. ${q.question}</div>
-          <div class="quiz-opts">
-            ${q.options.map((opt, i) => `<div class="quiz-opt" data-opt="${i}" onclick="selectOption(${idx},${i})">${opt}</div>`).join('')}
-          </div>
-          <div class="quiz-expl" id="expl-${idx}"><strong>💡 Объяснение:</strong> ${q.explanation}</div>
-        </div>`;
+    if(k.startsWith('sk-')&&!k.startsWith('sk-ant-')){
+      const r=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},
+        body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:maxTok,temperature:0.1})
       });
-      cont.innerHTML = html;
-      document.getElementById('quiz-submit').style.display = 'block';
-      state.currentQuiz = quiz;
+      if(!r.ok)return null;
+      const d=await r.json();
+      return d.choices?.[0]?.message?.content||null;
     }
+  }catch(e){return null;}
+  return null;
+}
 
-    window.selectOption = (qIdx, optIdx) => {
-      const card = document.querySelector(`.quiz-card[data-idx="${qIdx}"]`);
-      card.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
-      card.querySelector(`.quiz-opt[data-opt="${optIdx}"]`).classList.add('selected');
-      card.dataset.selected = optIdx;
-    };
-
-    window.submitQuiz = async () => {
-      const cards = document.querySelectorAll('.quiz-card');
-      let score = 0, total = cards.length;
-      
-      cards.forEach(card => {
-        const idx = card.dataset.idx;
-        const selected = card.dataset.selected;
-        const correct = state.currentQuiz[idx].correct;
-        const expl = document.getElementById(`expl-${idx}`);
-        
-        if(selected == correct) {
-          card.querySelector(`.quiz-opt[data-opt="${selected}"]`).classList.add('correct');
-          score++;
-        } else {
-          card.querySelector(`.quiz-opt[data-opt="${selected}"]`)?.classList.add('wrong');
-          card.querySelector(`.quiz-opt[data-opt="${correct}"]`).classList.add('correct');
-          if(state.currentTopic && !state.weakPoints.includes(state.currentTopic)) state.weakPoints.push(state.currentTopic);
-        }
-        expl.style.display = 'block';
+async function testKey(key){
+  const k=key.trim();
+  try{
+    if(k.startsWith('gsk_')){
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},
+        body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:'hi'}],max_tokens:1})
       });
-      
-      state.quizScore = Math.round((score/total)*100);
-      state.progress = Math.min(100, state.progress + state.quizScore/10);
-      
-      const result = document.getElementById('quiz-result');
-      result.style.display = 'block';
-      result.innerHTML = `<p style="text-align:center;font-size:16px;font-weight:700">🎯 Результат: ${score}/${total} (${state.quizScore}%)</p>
-        <p style="text-align:center;color:var(--muted);font-size:12px">AI запомнит ошибки для будущих тестов.</p>`;
-      
-      document.getElementById('quiz-submit').style.display = 'none';
-      saveState(); renderAll();
-    };
-
-    window.generateNewQuiz = () => { generateDailyQuiz(); };
-
-    // === TEXT CHECKER ===
-    window.checkLongText = async () => {
-      const txt = document.getElementById('text-input').value.trim();
-      const btn = document.getElementById('check-btn');
-      const res = document.getElementById('text-result');
-      if(txt.length<15) return alert('⚠️ Текст слишком короткий.');
-      btn.disabled=true; btn.innerHTML='<span class="loader"></span> Анализ...';
-      res.style.display='none';
-
-      if(state.isOffline || !state.groqKey) {
-        res.innerHTML='<p>🌐 Офлайн-режим: базовая проверка пройдена. Добавьте ключ для детального разбора падежей, видов и стилистики.</p>';
-        res.style.display='block'; btn.disabled=false; btn.innerHTML='🔍 Анализировать'; return;
-      }
-
-      try {
-        const p = `Проверь текст на русском. Верни СТРОГО JSON: {"corrected":"полный исправленный текст","errors":[{"wrong":"фраза","correct":"фраза","reason":"правило на русском"}]}`;
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Только JSON.'},{role:'user',content:p+`\nТекст: "${txt}"`}], max_tokens:600, temperature:0.1})
-        });
-        const d = await r.json();
-        let raw = d.choices[0].message.content.replace(/^
-```json\s*/i,'').replace(/
-```$/,'').trim();
-        const data = JSON.parse(raw);
-        let html = `<p class="correct">✅ Исправленный текст:</p><p style="margin-bottom:10px">${data.corrected}</p><p style="color:var(--warn);margin-bottom:6px">📝 Разбор:</p>`;
-        if(data.errors.length===0) html+='<p>Ошибок не найдено. Текст грамотный.</p>';
-        else data.errors.forEach(e=> html+=`<div class="mistake"><span class="err">${e.wrong}</span> → <strong>${e.correct}</strong><br>${e.reason}</div>`);
-        res.innerHTML=html; res.style.display='block';
-      } catch(e) {
-        res.innerHTML='<p style="color:var(--error)">⚠️ Ошибка сети или формата. Попробуйте позже.</p>'; res.style.display='block';
-      }
-      btn.disabled=false; btn.innerHTML='🔍 Анализировать';
-    };
-
-    // === AI CHAT ===
-    window.sendToAI = async () => {
-      const inp = document.getElementById('ai-input');
-      const txt = inp.value.trim(); if(!txt) return;
-      const chat = document.getElementById('ai-chat');
-      chat.innerHTML += `<div class="msg user">${txt}</div>`; inp.value='';
-      const t = document.createElement('div'); t.className='msg ai'; t.innerHTML='<span class="typing"></span><span class="typing"></span>'; chat.appendChild(t); chat.scrollTop=chat.scrollHeight;
-
-      if(state.isOffline || !state.groqKey) {
-        setTimeout(()=>{t.remove(); chat.innerHTML+=`<div class="msg ai"><strong>🤖 AI:</strong> Офлайн-режим. Добавьте ключ для полноценного диалога.</div>`; chat.scrollTop=chat.scrollHeight;},500);
-        return;
-      }
-      try {
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method:'POST', headers:{'Authorization':`Bearer ${state.groqKey}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'llama-3.1-8b-instant', messages:[{role:'system',content:'Ты репетитор русского языка. Отвечай кратко, дружелюбно, с примерами на русском. Макс 4 предложения.'},{role:'user',content:txt}], max_tokens:120})
-        });
-        const d = await r.json();
-        t.remove(); chat.innerHTML+=`<div class="msg ai"><strong>🤖 AI:</strong> ${d.choices[0].message.content}</div>`; chat.scrollTop=chat.scrollHeight;
-      } catch(e) { t.remove(); chat.innerHTML+=`<div class="msg ai"><strong>🤖 AI:</strong> ⚠️ Ошибка соединения.</div>`; chat.scrollTop=chat.scrollHeight; }
-      state.progress=Math.min(100,state.progress+1); saveState();
-    };
-    document.getElementById('ai-input').addEventListener('keypress', e=>{if(e.key==='Enter') sendToAI()});
-
-    // === PROGRESS & PDF ===
-    const renderAll = () => {
-      document.getElementById('streak-val').textContent = state.streak;
-      document.getElementById('home-percent').textContent = `${state.progress}%`;
-      document.getElementById('ring-progress').style.strokeDashoffset = 150.8 - (state.progress/100)*150.8;
-      document.getElementById('stats-container').innerHTML = `
-        <div style="display:grid;gap:8px;margin-bottom:10px">
-          <div class="tag strong">✅ Тем изучено: ${state.exploredTopics.length}</div>
-          <div class="tag critical">⚠️ Зоны роста: ${state.weakPoints.length}</div>
-          <div class="tag">🎯 Тестов пройдено: ${state.quizHistory.length}</div>
-          <div class="tag">🔑 AI: ${state.isOffline?'Офлайн':'Глобал'}</div>
-        </div>`;
-      const plans = ['🔍 Выберите любую тему','🎯 Пройдите ежедневный тест','📝 Проверьте 1 текст','🤖 Задайте 2 вопроса AI'];
-      document.getElementById('daily-plan').innerHTML = plans.slice(0, state.progress<20?2:4).map(p=>`<li>${p}</li>`).join('');
-      renderHistory();
-    };
-    const renderHistory = () => {
-      const c = document.getElementById('topic-history');
-      c.innerHTML = state.history.map(h=>`<span class="tag" onclick="quickSearch('${h.replace(/'/g,"\\'")}')">${h}</span>`).join('');
-    };
-    window.exportPDF = () => {
-      if(!window.jspdf) return alert('📦 PDF-библиотека загружается. Подождите 5 сек.');
-      const {jsPDF} = window.jspdf; const doc = new jsPDF();
-      doc.setFontSize(18); doc.text('🇷🇺 RUSMASTER PRO — Отчёт', 20, 20);
-      doc.setFontSize(12); doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')}`, 20, 35);
-      doc.text(`Прогресс: ${state.progress}% | Серия: ${state.streak} дн.`, 20, 45);
-      doc.text(`Тем пройдено: ${state.exploredTopics.length}`, 20, 55);
-      doc.text(`Режим: ${state.isOffline?'Офлайн':'Groq AI'}`, 20, 65);
-      doc.text('🎯 Рекомендации:', 20, 85);
-      doc.text('• Повторяйте слабые места через 1, 3, 7 дней', 25, 95);
-      doc.text('• Пишите короткие тексты ежедневно', 25, 105);
-      doc.text('• Используйте "Углубить" для нюансов', 25, 115);
-      doc.save(`rusmaster-pro-${new Date().toISOString().slice(0,10)}.pdf`);
-    };
-    window.resetProgress = () => { if(confirm('Сбросить всё?')) { localStorage.removeItem('rusmaster_pro_v2'); location.reload(); } };
-
-    // === PWA ===
-    if('serviceWorker' in navigator) {
-      const sw = `self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
-      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})));
+      return r.status===200;
     }
-  </script>
-</body>
-</html>
+    if(k.startsWith('sk-')&&!k.startsWith('sk-ant-')){
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+k}});
+      return r.status===200;
+    }
+    if(k.startsWith('sk-ant-'))return 'cors';
+  }catch(e){return false;}
+  return false;
+}
 
+window.validateKey=async()=>{
+  const key=document.getElementById('api-inp').value.trim();
+  if(!key||key.length<10){showApiErr('Введите корректный ключ');return;}
+  const btn=document.querySelector('#modal-api .btn-p');
+  btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  const ok=await testKey(key);
+  btn.innerHTML='✓ Подключить';btn.disabled=false;
+  if(ok==='cors'){showApiErr('Ключи Anthropic (sk-ant-...) не работают из браузера. Используйте Groq (gsk_...): console.groq.com');return;}
+  if(ok){S.key=key;localStorage.setItem('rm_key',key);S.offline=false;closeModal('modal-api');showToast('✅ AI подключён!','ok');renderAll();}
+  else showApiErr('❌ Неверный ключ. Используйте Groq (gsk_...) или OpenAI (sk-...)');
+};
+window.enterOffline=()=>{S.offline=true;closeModal('modal-api');showToast('🌐 Офлайн-режим','ok');renderAll();};
+function showApiErr(m){const e=document.getElementById('api-err');e.textContent=m;e.style.display='block';}
+
+// ═══ JSON EXTRACT ════════════════════════════
+function extractJSON(raw,isArray){
+  if(!raw)return null;
+  try{
+    let s=raw.trim();
+    s=s.replace(/^
+```(?:json)?\s*/i,'').replace(/
+```\s*$/,'').trim();
+    const open=isArray?'[':'{';
+    const close=isArray?']':'}';
+    const si=s.indexOf(open);const ei=s.lastIndexOf(close);
+    if(si!==-1&&ei!==-1)s=s.slice(si,ei+1);
+    return JSON.parse(s);
+  }catch(e){return null;}
+}
+
+// ═══ LESSON GENERATION ═══════════════════════
+function getTopicName(id){return ALL_TOPICS.find(t=>t.id===id)?.t||id;}
+
+async function generateLesson(topicId){
+  const topic=getTopicName(topicId);
+  const sys='Ты профессор русского языка. Отвечай ТОЛЬКО валидным JSON без markdown и без текста вне JSON. Весь контент строго на русском языке.';
+  const usr='Создай ПОЛНЫЙ урок по теме: "'+topic+'". Уровень ученика: '+S.level+'.\nВерни строго этот JSON (все поля обязательны, весь текст на русском):\n{"title":"название урока","explanation":"подробное объяснение 3-4 абзаца с правилами, логикой, исключениями, историческим контекстом если уместно","grammar_focus":["правило 1","правило 2","правило 3"],"examples":[{"ru":"пример предложения на русском","note":"грамматическое пояснение на русском"},{"ru":"ещё пример","note":"пояснение"},{"ru":"третий пример","note":"пояснение"}],"common_mistakes":[{"wrong":"неверный вариант","correct":"верный вариант","reason":"почему это ошибка и как запомнить"}],"practice":{"items":[{"q":"вопрос или задание на русском","a":"правильный ответ","hint":"подсказка на русском"}]},"flashcards":[{"front":"слово или фраза","back":"значение или перевод","ctx":"пример в предложении"}],"cultural_note":"культурный контекст или интересный факт о языке","related":["смежная тема 1","смежная тема 2","смежная тема 3"]}';
+  if(S.offline||!S.key)return getFallback(topicId);
+  const raw=await callAI(sys,usr,2200);
+  const lesson=extractJSON(raw,false);
+  if(lesson){if(lesson.flashcards?.length)addFlashcards(lesson.flashcards);return lesson;}
+  return getFallback(topicId);
+}
+
+function getFallback(id){
+  const map={
+    alphabet:{title:'🔤 Алфавит и произношение',
+      explanation:'Русский алфавит (кириллица) состоит из 33 букв.\n\n✅ 10 гласных: А, Е, Ё, И, О, У, Ы, Э, Ю, Я\n✅ 21 согласная\n✅ 2 знака: ъ (твёрдый) и ь (мягкий)\n\nКлюч к произношению: ударный слог произносится чётко, безударные гласные редуцируются. Например: молоко = [малако].\n\nБуквы, похожие на латиницу: А=А, О=О, М=М, Т=Т, Н=Н. Сложные буквы: Ы (звук между И и У), Ъ и Ь (не имеют звука, влияют на пред
