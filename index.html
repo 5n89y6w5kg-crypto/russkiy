@@ -1,208 +1,521 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#060B14">
-<title>RUSMASTER ULTRA</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RusMaster">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇷🇺</text></svg>">
+<title>RusMaster Ultra</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
+/* ── DESIGN TOKENS ─────────────────────────────── */
+:root {
   --bg:#060B14;--bg2:#0D1526;--card:#111D33;--card2:#162038;
-  --accent:#00D4FF;--accent2:#0098CC;--gold:#FFD700;--gold2:#FFA500;
-  --success:#00E676;--warn:#FFB300;--error:#FF4757;--ai:#BF5FFF;
-  --text:#EEF2FF;--muted:#7A8BAA;--border:#1E2D4A;
+  --acc:#00D4FF;--acc2:#0098CC;--gold:#FFD700;--gold2:#FFA500;
+  --ok:#00E676;--warn:#FFB300;--err:#FF4757;--ai:#BF5FFF;
+  --txt:#EEF2FF;--mut:#7A8BAA;--brd:#1E2D4A;
   --r:16px;--fh:'Unbounded',sans-serif;--fb:'Mulish',sans-serif;
+  --shadow:0 8px 32px rgba(0,0,0,.4);
+  --glow-a:0 0 20px rgba(0,212,255,.25);
+  --glow-g:0 0 20px rgba(0,230,118,.2);
+  --t:.2s;
+}
+[data-theme="light"] {
+  --bg:#F0F4FF;--bg2:#E4EAF8;--card:#FFFFFF;--card2:#F8FAFF;
+  --txt:#0D1526;--mut:#5A6A8A;--brd:#C8D4F0;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden;padding-bottom:85px}
-body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
-  background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,0.06),transparent 60%),
-             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(191,95,255,0.05),transparent 60%);
-  pointer-events:none;z-index:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);
+  min-height:100vh;overflow-x:hidden;padding-bottom:80px;
+  transition:background var(--t),color var(--t)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,.06),transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(191,95,255,.05),transparent 60%)}
+[data-theme="light"] body::before{opacity:.3}
+
+/* ── LAYOUT ─────────────────────────────────────── */
 .wrap{max-width:480px;margin:0 auto;padding:0 14px;position:relative;z-index:1}
-.hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 0 10px}
-.logo{font-family:var(--fh);font-size:14px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--ai));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ── HEADER ─────────────────────────────────────── */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 0 8px;gap:8px}
+.logo{font-family:var(--fh);font-size:13px;font-weight:900;
+  background:linear-gradient(135deg,var(--acc),var(--ai));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
 .logo span{-webkit-text-fill-color:var(--gold)}
-.hdr-r{display:flex;gap:7px;align-items:center}
-.streak{background:linear-gradient(135deg,#FF6B00,#FFD700);color:#000;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--fh)}
-.lvl{background:var(--card2);border:1px solid var(--border);color:var(--accent);padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer}
-.xp-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--fh)}
-.xp-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
-.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ai));border-radius:2px;transition:width .5s}
+.hdr-r{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.streak-pill{background:linear-gradient(135deg,#FF6B00,#FFD700);color:#000;
+  padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--fh)}
+.lvl-pill{background:var(--card2);border:1px solid var(--brd);color:var(--acc);
+  padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;
+  font-family:var(--fh);transition:all var(--t)}
+.lvl-pill:active{transform:scale(.95)}
+
+/* AI STATUS DOT */
+.ai-status{display:flex;align-items:center;gap:5px;padding:5px 9px;
+  background:var(--card2);border:1px solid var(--brd);border-radius:20px;
+  font-size:10px;font-weight:700;font-family:var(--fh);cursor:pointer;transition:all var(--t)}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--mut);transition:background var(--t)}
+.ai-dot.connected{background:var(--ok);box-shadow:0 0 6px var(--ok);animation:pulse-dot 2s infinite}
+.ai-dot.error{background:var(--err)}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── XP BAR ─────────────────────────────────────── */
+.xp-wrap{margin-bottom:14px}
+.xp-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);
+  margin-bottom:4px;font-family:var(--fh)}
+.xp-track{height:5px;background:var(--brd);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--ai));
+  border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);
+  box-shadow:var(--glow-a)}
+
+/* ── SCREENS ─────────────────────────────────────── */
 .screen{display:none;flex-direction:column;gap:12px}
-.screen.active{display:flex;animation:fadeIn .25s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.card{background:var(--card);border-radius:var(--r);padding:16px;border:1px solid var(--border);position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.35}
-.ct{font-family:var(--fh);font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.card p{color:var(--muted);font-size:12px;line-height:1.5;margin-bottom:8px}
-.hero{background:linear-gradient(135deg,#0D1B35,#162038,#0D1B35);border:1px solid rgba(0,212,255,0.2);padding:20px;border-radius:var(--r);text-align:center}
-.hring{position:relative;width:90px;height:90px;margin:0 auto 14px}
+.screen.active{display:flex;animation:slideUp .25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ──────────────────────────────────────── */
+.card{background:var(--card);border-radius:var(--r);padding:16px;
+  border:1px solid var(--brd);position:relative;overflow:hidden;
+  transition:background var(--t),border var(--t);box-shadow:var(--shadow)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:.4}
+.ct{font-family:var(--fh);font-size:12px;font-weight:700;margin-bottom:10px;
+  display:flex;align-items:center;gap:7px;letter-spacing:.3px}
+.card p{color:var(--mut);font-size:12px;line-height:1.55;margin-bottom:8px}
+
+/* HERO CARD */
+.hero{background:linear-gradient(135deg,#0D1B35,#162038,#0D1B35);
+  border:1px solid rgba(0,212,255,.2);padding:20px;border-radius:var(--r);text-align:center}
+.hring{position:relative;width:88px;height:88px;margin:0 auto 12px}
 .hring svg{transform:rotate(-90deg)}
-.rbg{fill:none;stroke:var(--border);stroke-width:6}
-.rfill{fill:none;stroke:url(#rg);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s}
-.rpct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--fh);font-size:18px;font-weight:900;color:var(--accent)}
-.htitle{font-family:var(--fh);font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.hsub{font-size:12px;color:var(--muted);margin-bottom:14px}
-.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:transform .12s;font-family:var(--fh)}
-.btn:active{transform:scale(0.97)}
-.bp{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;box-shadow:0 0 20px rgba(0,212,255,0.3)}
+.rbg{fill:none;stroke:var(--brd);stroke-width:7}
+.rfill{fill:none;stroke:url(#rg);stroke-width:7;stroke-linecap:round;
+  transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1)}
+.rpct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--fh);font-size:17px;font-weight:900;color:var(--acc)}
+.htitle{font-family:var(--fh);font-size:19px;font-weight:900;
+  background:linear-gradient(135deg,#fff,var(--acc));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:3px}
+.hsub{font-size:11px;color:var(--mut);margin-bottom:14px}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:13px;
+  font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .12s;
+  font-family:var(--fh);letter-spacing:.3px}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#000;box-shadow:var(--glow-a)}
 .bg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
 .bai{background:linear-gradient(135deg,var(--ai),#8830DD);color:#fff}
-.bo{background:transparent;border:1.5px solid var(--border);color:var(--text)}
-.bred{background:linear-gradient(135deg,var(--error),#CC0000);color:#fff}
+.bok{background:linear-gradient(135deg,var(--ok),#00B356);color:#000}
+.bo{background:transparent;border:1.5px solid var(--brd);color:var(--txt)}
+.bred{background:linear-gradient(135deg,var(--err),#CC0000);color:#fff}
 .bsm{padding:8px 12px;font-size:11px;width:auto}
+.bicon{width:auto;padding:9px 11px}
+
+/* ── METHODS ─────────────────────────────────────── */
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.mc{background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
-.mc.active{border-color:var(--accent);background:rgba(0,212,255,0.07)}
+.mc{background:var(--card2);border:1.5px solid var(--brd);border-radius:12px;
+  padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.mc.active{border-color:var(--acc);background:rgba(0,212,255,.08);box-shadow:var(--glow-a)}
+.mc:active{transform:scale(.97)}
 .mi{font-size:24px;margin-bottom:5px}
 .mn{font-family:var(--fh);font-size:10px;font-weight:700;margin-bottom:2px}
-.md{font-size:9px;color:var(--muted);line-height:1.3}
-.mg{margin-bottom:12px}
-.mh{font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
-.tb{width:100%;text-align:left;padding:11px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:12px;font-family:var(--fb);font-weight:600;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;transition:all .12s}
-.tb:active{transform:scale(0.98)}
-.tb.done{background:rgba(0,230,118,0.07);border-color:rgba(0,230,118,0.3);color:var(--success)}
-.tb.weak{background:rgba(255,71,87,0.05);border-color:rgba(255,71,87,0.2)}
+.md{font-size:9px;color:var(--mut);line-height:1.3}
+
+/* ── CURRICULUM ─────────────────────────────────── */
+.mod-g{margin-bottom:14px}
+.mod-h{font-family:var(--fh);font-size:10px;font-weight:700;color:var(--acc);
+  letter-spacing:1px;text-transform:uppercase;padding:6px 0;
+  border-bottom:1px solid var(--brd);margin-bottom:8px}
+.tb{width:100%;text-align:left;padding:11px 14px;background:var(--card2);
+  border:1px solid var(--brd);border-radius:10px;color:var(--txt);cursor:pointer;
+  font-size:12px;font-family:var(--fb);font-weight:600;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:6px;transition:all .12s}
+.tb:active{transform:scale(.98)}
+.tb.done{background:rgba(0,230,118,.07);border-color:rgba(0,230,118,.3);color:var(--ok)}
+.tb.weak{background:rgba(255,71,87,.05);border-color:rgba(255,71,87,.2)}
 .db{padding:3px 7px;border-radius:20px;font-size:9px;font-weight:700;font-family:var(--fh)}
-.da1{background:rgba(0,230,118,0.15);color:var(--success)}
-.da2{background:rgba(0,212,255,0.15);color:var(--accent)}
-.db1{background:rgba(255,179,0,0.15);color:var(--warn)}
-.db2{background:rgba(255,71,87,0.15);color:var(--error)}
-.dc1{background:rgba(191,95,255,0.15);color:var(--ai)}
-.lnav{display:flex;align-items:center;justify-content:space-between;font-family:var(--fh);font-size:10px;color:var(--muted);margin-bottom:12px}
-.lnav button{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700}
+.da1{background:rgba(0,230,118,.15);color:var(--ok)}
+.da2{background:rgba(0,212,255,.15);color:var(--acc)}
+.db1{background:rgba(255,179,0,.15);color:var(--warn)}
+.dc1{background:rgba(191,95,255,.15);color:var(--ai)}
+
+/* ── SEARCH ─────────────────────────────────────── */
+.search-wrap{position:relative;margin-bottom:10px}
+.search-inp{width:100%;padding:11px 11px 11px 38px;background:var(--card2);
+  border:1.5px solid var(--brd);border-radius:12px;color:var(--txt);
+  font-size:13px;font-family:var(--fb);outline:none;transition:border .2s}
+.search-inp:focus{border-color:var(--acc)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  font-size:15px;pointer-events:none}
+
+/* ── LESSON ─────────────────────────────────────── */
+.lnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.lnav-btn{background:var(--card2);border:1px solid var(--brd);color:var(--txt);
+  padding:8px 14px;border-radius:10px;font-size:11px;cursor:pointer;
+  font-weight:700;font-family:var(--fh);transition:all .15s;flex-shrink:0}
+.lnav-btn:active{transform:scale(.96)}
+.lpos{font-size:11px;color:var(--mut);font-family:var(--fh);text-align:center;flex:1}
+.les-prog{height:3px;background:var(--brd);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.les-prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--ai));
+  border-radius:2px;transition:width .4s}
 .ls{margin-bottom:16px}
-.lh{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.lh::after{content:'';flex:1;height:1px;background:var(--border)}
-.lt{font-size:13px;line-height:1.65;color:var(--text)}
-.exb{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:6px 0}
-.exr{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px}
-.exn{font-size:11px;color:var(--warn);padding:4px 8px;background:rgba(255,179,0,0.08);border-radius:6px;display:inline-block}
-.errb{background:rgba(255,71,87,0.06);border-left:3px solid var(--error);border-radius:0 8px 8px 0;padding:10px;margin:5px 0;font-size:12px}
-.errw{color:var(--error);text-decoration:line-through;font-size:11px}
-.errr{color:var(--success);font-weight:700;margin:3px 0}
-.errx{color:var(--muted);font-size:11px}
-.gtag{display:inline-block;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:var(--accent);padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;margin:3px 2px;font-family:var(--fh)}
-.exc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0}
-.exq{font-size:13px;font-weight:600;margin-bottom:10px;line-height:1.4}
-.exi{width:100%;padding:10px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;transition:border .2s}
-.exi:focus{border-color:var(--accent)}
-.exi.ok{border-color:var(--success);background:rgba(0,230,118,0.05)}
-.exi.no{border-color:var(--error);background:rgba(255,71,87,0.05)}
-.exf{font-size:12px;margin-top:7px;min-height:16px;line-height:1.5}
-.cb{margin-top:8px;padding:8px 16px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh)}
-.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin:8px 0}
+.lh{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--acc);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px}
+.lh::after{content:'';flex:1;height:1px;background:var(--brd)}
+.lt{font-size:13px;line-height:1.65;color:var(--txt)}
+.exb{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:12px;margin:6px 0}
+.ex-row{display:flex;align-items:flex-start;gap:8px}
+.exr{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:4px;flex:1}
+.exn{font-size:11px;color:var(--warn);padding:4px 8px;background:rgba(255,179,0,.08);
+  border-radius:6px;display:inline-block;margin-top:4px}
+.speak-btn{background:none;border:1px solid var(--brd);border-radius:8px;padding:6px 8px;
+  cursor:pointer;font-size:14px;flex-shrink:0;transition:all .15s;color:var(--txt)}
+.speak-btn:active{transform:scale(.9);background:rgba(0,212,255,.1)}
+.errb{background:rgba(255,71,87,.06);border-left:3px solid var(--err);
+  border-radius:0 8px 8px 0;padding:10px;margin:5px 0;font-size:12px}
+.errw{color:var(--err);text-decoration:line-through;font-size:11px}
+.errr{color:var(--ok);font-weight:700;margin:3px 0}
+.errx{color:var(--mut);font-size:11px}
+.gtag{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);
+  color:var(--acc);padding:3px 8px;border-radius:20px;font-size:10px;
+  font-weight:700;margin:3px 2px;font-family:var(--fh)}
+
+/* ── PRACTICE ───────────────────────────────────── */
+.prac-item{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:14px;margin:8px 0}
+.prac-q{font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.4}
+.prac-hint{font-size:10px;color:var(--mut);margin-bottom:8px}
+.prac-inp{width:100%;padding:10px 12px;background:var(--card);border:1.5px solid var(--brd);
+  border-radius:8px;color:var(--txt);font-size:13px;font-family:var(--fb);
+  outline:none;transition:border .2s}
+.prac-inp:focus{border-color:var(--acc)}
+.prac-inp.ok{border-color:var(--ok)!important;background:rgba(0,230,118,.05)}
+.prac-inp.no{border-color:var(--err)!important;background:rgba(255,71,87,.05)}
+.prac-feed{font-size:12px;margin-top:7px;min-height:18px;line-height:1.5}
+.prac-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chk-btn{padding:8px 16px;background:var(--card2);border:1px solid var(--brd);
+  color:var(--txt);border-radius:8px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--fh);transition:all .15s}
+.chk-btn:hover{border-color:var(--acc);color:var(--acc)}
+.hint-btn{padding:8px 12px;background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3);
+  color:var(--warn);border-radius:8px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--fh);display:none}
+
+/* ── QUIZ ───────────────────────────────────────── */
+.qcard{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px;margin:8px 0}
 .qq{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.5}
 .qopts{display:grid;gap:8px}
-.qo{padding:12px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--fb);font-weight:600;color:var(--text);width:100%}
-.qo:active{transform:scale(0.98)}
-.qo.sok{border-color:var(--success)!important;background:rgba(0,230,118,0.12)!important;color:var(--success)!important}
-.qo.sno{border-color:var(--error)!important;background:rgba(255,71,87,0.12)!important;color:var(--error)!important}
-.qo.rok{border-color:var(--success)!important;background:rgba(0,230,118,0.07)!important;color:var(--success)!important}
+.qo{padding:12px 14px;background:var(--card);border:1.5px solid var(--brd);border-radius:10px;
+  font-size:13px;cursor:pointer;text-align:left;font-family:var(--fb);font-weight:600;
+  color:var(--txt);width:100%;transition:all .15s}
+.qo:active{transform:scale(.98)}
+.qo:hover{border-color:var(--acc)}
+.qo.sok{border-color:var(--ok)!important;background:rgba(0,230,118,.12)!important;color:var(--ok)!important}
+.qo.sno{border-color:var(--err)!important;background:rgba(255,71,87,.12)!important;color:var(--err)!important}
+.qo.rok{border-color:var(--ok)!important;background:rgba(0,230,118,.07)!important;color:var(--ok)!important}
 .qo:disabled{cursor:default}
-.qex{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5;padding:10px;background:rgba(255,179,0,0.06);border-radius:8px;border-left:3px solid var(--warn)}
-.qprog{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
-.qpf{height:100%;background:linear-gradient(90deg,var(--accent),var(--ai));border-radius:2px;transition:width .4s}
-.qmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;font-family:var(--fh)}
-.srb{background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,165,0,0.04));border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:14px}
+.qex{margin-top:10px;font-size:12px;color:var(--mut);line-height:1.5;
+  padding:10px;background:rgba(255,179,0,.06);border-radius:8px;border-left:3px solid var(--warn)}
+.qprog{height:4px;background:var(--brd);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.qpf{height:100%;background:linear-gradient(90deg,var(--acc),var(--ai));border-radius:2px;transition:width .4s}
+.qmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:8px;font-family:var(--fh)}
+.qrs{font-family:var(--fh);font-size:52px;font-weight:900;text-align:center;
+  color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,.4)}
+
+/* ── FLASHCARDS ─────────────────────────────────── */
+.srb{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,165,0,.04));
+  border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:14px}
 .srn{font-family:var(--fh);font-size:28px;font-weight:900;color:var(--gold);text-align:center}
-.srl{text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px}
-.fc{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:var(--r);padding:30px 20px;text-align:center;min-height:160px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;position:relative}
-.fc::after{content:'нажмите, чтобы перевернуть';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);font-family:var(--fh)}
-.fcf{font-size:28px;font-weight:700;font-family:var(--fh)}
-.fcb{font-size:16px;color:var(--success);font-weight:600;display:none}
-.fcc{font-size:11px;color:var(--muted);margin-top:8px}
+.srl{text-align:center;font-size:11px;color:var(--mut);margin-bottom:10px}
+.fc{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--brd);
+  border-radius:var(--r);padding:30px 20px;text-align:center;min-height:160px;
+  display:flex;flex-direction:column;justify-content:center;cursor:pointer;position:relative}
+.fc::after{content:'нажмите, чтобы перевернуть';position:absolute;bottom:8px;left:50%;
+  transform:translateX(-50%);font-size:9px;color:var(--mut);font-family:var(--fh)}
+.fcf{font-size:26px;font-weight:700;font-family:var(--fh)}
+.fcb{font-size:15px;color:var(--ok);font-weight:600;display:none}
+.fcc{font-size:11px;color:var(--mut);margin-top:8px;display:none}
 .fcctrl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
 .fcbtn{padding:10px;border-radius:10px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh)}
-.fce{background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3)}
-.fch{background:rgba(255,179,0,0.15);color:var(--warn);border:1px solid rgba(255,179,0,0.3)}
-.fca{background:rgba(255,71,87,0.15);color:var(--error);border:1px solid rgba(255,71,87,0.3)}
-textarea.ti{width:100%;min-height:100px;padding:12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;resize:vertical;line-height:1.5;transition:border .2s}
-textarea.ti:focus{border-color:var(--accent)}
-.rb{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px;font-size:13px;line-height:1.6;max-height:400px;overflow-y:auto}
+.fce{background:rgba(0,230,118,.15);color:var(--ok);border:1px solid rgba(0,230,118,.3)}
+.fch{background:rgba(255,179,0,.15);color:var(--warn);border:1px solid rgba(255,179,0,.3)}
+.fca{background:rgba(255,71,87,.15);color:var(--err);border:1px solid rgba(255,71,87,.3)}
+
+/* ── TEXT CHECK ─────────────────────────────────── */
+textarea.ti{width:100%;min-height:100px;padding:12px;background:var(--bg2);
+  border:1.5px solid var(--brd);border-radius:10px;color:var(--txt);
+  font-size:13px;font-family:var(--fb);outline:none;resize:vertical;
+  line-height:1.5;transition:border .2s}
+textarea.ti:focus{border-color:var(--acc)}
+.rb{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+  padding:14px;margin-top:10px;font-size:13px;line-height:1.6;max-height:400px;overflow-y:auto}
+
+/* ── CHAT ───────────────────────────────────────── */
 .cw{display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:260px;max-height:45vh}
-.msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;animation:fadeIn .2s}
-.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:600;border-bottom-right-radius:4px}
-.msg.ai{align-self:flex-start;background:var(--card2);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;animation:slideUp .2s}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#000;font-weight:600;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--card2);border:1px solid var(--brd);border-bottom-left-radius:4px}
 .msg.ai strong{color:var(--ai)}
 .crow{display:flex;gap:6px;margin-top:8px}
-.ci{flex:1;padding:10px 14px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none}
-.ci:focus{border-color:var(--accent)}
-.sb{padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#000;font-size:16px;cursor:pointer;font-weight:900}
+.ci{flex:1;padding:10px 14px;background:var(--card2);border:1.5px solid var(--brd);
+  border-radius:10px;color:var(--txt);font-size:13px;font-family:var(--fb);outline:none;transition:border .2s}
+.ci:focus{border-color:var(--acc)}
+.sbtn{padding:10px 14px;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none;border-radius:10px;color:#000;font-size:16px;cursor:pointer;font-weight:900}
+
+/* ── PROGRESS ───────────────────────────────────── */
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sb2{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.sn{font-family:var(--fh);font-size:24px;font-weight:900;color:var(--accent)}
-.sl{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--fh)}
+.sb2{background:var(--card2);border:1px solid var(--brd);border-radius:12px;padding:14px;text-align:center}
+.sn{font-family:var(--fh);font-size:24px;font-weight:900;color:var(--acc)}
+.sl{font-size:10px;color:var(--mut);margin-top:3px;font-family:var(--fh)}
 .hmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:8px 0}
-.hc{aspect-ratio:1;border-radius:3px;background:var(--border)}
-.hc.l1{background:rgba(0,212,255,0.2)}.hc.l2{background:rgba(0,212,255,0.45)}
-.hc.l3{background:rgba(0,212,255,0.7)}.hc.l4{background:var(--accent)}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:390px;padding:22px;position:relative}
-.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--ai))}
+.hc{aspect-ratio:1;border-radius:3px;background:var(--brd)}
+.hc.l1{background:rgba(0,212,255,.2)}.hc.l2{background:rgba(0,212,255,.45)}
+.hc.l3{background:rgba(0,212,255,.7)}.hc.l4{background:var(--acc)}
+
+/* Progress bars */
+.prog-bar-wrap{margin:6px 0}
+.prog-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:4px}
+.prog-bar-track{height:8px;background:var(--brd);border-radius:4px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:4px;transition:width .6s}
+.prog-bar-fill.acc{background:linear-gradient(90deg,var(--acc),var(--ai))}
+.prog-bar-fill.ok{background:linear-gradient(90deg,var(--ok),#00B356)}
+.prog-bar-fill.warn{background:linear-gradient(90deg,var(--warn),var(--gold))}
+.prog-bar-fill.ai{background:linear-gradient(90deg,var(--ai),#8830DD)}
+
+/* ── CHART ──────────────────────────────────────── */
+.chart-wrap{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+  padding:14px;margin-top:8px}
+.chart-title{font-family:var(--fh);font-size:10px;color:var(--mut);margin-bottom:10px;letter-spacing:.5px}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:70px}
+.chart-bar{flex:1;background:linear-gradient(to top,var(--acc),var(--ai));
+  border-radius:3px 3px 0 0;min-height:3px;transition:height .4s;cursor:default;
+  position:relative}
+.chart-bar:hover::after{content:attr(data-val);position:absolute;top:-20px;left:50%;
+  transform:translateX(-50%);font-size:9px;color:var(--txt);white-space:nowrap;
+  background:var(--card);padding:2px 5px;border-radius:4px}
+.chart-labels{display:flex;gap:4px;margin-top:4px}
+.chart-lbl{flex:1;text-align:center;font-size:8px;color:var(--mut);font-family:var(--fh)}
+
+/* ── DIALOG ─────────────────────────────────────── */
+.scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scene-card{background:var(--card2);border:1px solid var(--brd);border-radius:12px;
+  padding:14px;cursor:pointer;transition:all .15s;text-align:center}
+.scene-card:active{transform:scale(.96)}
+.scene-card:hover{border-color:var(--acc)}
+.scene-icon{font-size:26px;margin-bottom:6px}
+.scene-title{font-family:var(--fh);font-size:11px;font-weight:700;margin-bottom:3px}
+.scene-desc{font-size:10px;color:var(--mut);line-height:1.3}
+.dial-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;animation:slideUp .2s}
+.dial-msg.ai{align-self:flex-start;background:var(--card2);border:1px solid var(--brd);border-bottom-left-radius:4px}
+.dial-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#000;font-weight:600;border-bottom-right-radius:4px}
+.dial-msg.sys{align-self:center;background:rgba(255,179,0,.08);border:1px solid rgba(255,179,0,.2);color:var(--warn);font-size:11px;border-radius:8px;text-align:center;max-width:100%}
+.dial-msgs{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow-y:auto;margin-bottom:10px}
+
+/* ── DICTATION ──────────────────────────────────── */
+.dict-card{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+  padding:24px 20px;text-align:center;min-height:100px;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:12px;margin-bottom:14px}
+.dict-status{font-size:13px;color:var(--mut)}
+.dict-stats{display:flex;justify-content:space-around;margin-top:14px}
+.dict-stat{text-align:center}
+.dict-stat-n{font-family:var(--fh);font-size:20px;font-weight:900}
+.dict-stat-l{font-size:10px;color:var(--mut);margin-top:2px;font-family:var(--fh)}
+
+/* ── MODAL ──────────────────────────────────────── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.88);
+  display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.modal{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);
+  width:100%;max-width:390px;padding:22px;position:relative;
+  animation:slideUp .2s;box-shadow:var(--shadow)}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--acc),var(--ai))}
 .mt{font-family:var(--fh);font-size:14px;font-weight:900;margin-bottom:8px}
-.ms{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:14px}
-.mi2{width:100%;padding:11px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--fb);outline:none;margin-bottom:8px}
-.mi2:focus{border-color:var(--accent)}
-.merr{color:var(--error);font-size:11px;margin-bottom:8px;display:none}
+.ms{font-size:11px;color:var(--mut);line-height:1.55;margin-bottom:14px}
+.mi{width:100%;padding:11px;background:var(--bg2);border:1.5px solid var(--brd);
+  border-radius:8px;color:var(--txt);font-size:13px;font-family:var(--fb);
+  outline:none;margin-bottom:8px;transition:border .2s}
+.mi:focus{border-color:var(--acc)}
+.merr{color:var(--err);font-size:11px;margin-bottom:8px;display:none}
 .lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
-.lo{padding:10px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .15s}
-.lo.sel{border-color:var(--accent);background:rgba(0,212,255,0.1);color:var(--accent)}
+.lo{padding:10px;background:var(--card2);border:1.5px solid var(--brd);border-radius:10px;
+  text-align:center;cursor:pointer;transition:all .15s}
+.lo.sel{border-color:var(--acc);background:rgba(0,212,255,.1);color:var(--acc)}
 .lon{font-family:var(--fh);font-size:12px;font-weight:700}
-.lod{font-size:10px;color:var(--muted);margin-top:2px}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,11,20,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 14px;z-index:100}
-.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 8px;border-radius:10px;flex:1;transition:all .15s}
-.ni.active{background:rgba(0,212,255,0.1)}
-.nico{font-size:19px}
-.nlb{font-size:9px;font-family:var(--fh);color:var(--muted);font-weight:700;letter-spacing:.3px}
-.ni.active .nlb{color:var(--accent)}
-.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:10px 0}
-.ttag{display:inline-block;padding:5px 10px;background:var(--card2);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;margin:3px 2px;transition:all .15s}
-.ttag:active{background:rgba(0,212,255,0.1);border-color:var(--accent)}
-.ttag.weak{border-color:rgba(255,71,87,0.3);color:var(--error)}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.lod{font-size:10px;color:var(--mut);margin-top:2px}
+
+/* ── DRAWER MENU ────────────────────────────────── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:260px;background:var(--card);
+  border-left:1px solid var(--brd);z-index:801;transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:20px 0 30px}
+.drawer.open{transform:translateX(0)}
+.drawer-header{padding:16px 20px 12px;border-bottom:1px solid var(--brd)}
+.drawer-logo{font-family:var(--fh);font-size:13px;font-weight:900;
+  background:linear-gradient(135deg,var(--acc),var(--ai));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.drawer-close{float:right;background:none;border:none;color:var(--mut);font-size:20px;cursor:pointer;margin-top:-2px}
+.drawer-section{padding:12px 20px 4px;font-family:var(--fh);font-size:9px;
+  color:var(--mut);letter-spacing:1px;text-transform:uppercase}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:11px 20px;
+  cursor:pointer;transition:background .15s;font-size:13px;font-weight:600}
+.drawer-item:active{background:rgba(0,212,255,.08)}
+.drawer-item .di-icon{font-size:18px;width:24px;text-align:center}
+.drawer-item .di-lbl{flex:1}
+.drawer-item .di-badge{background:var(--acc);color:#000;padding:2px 7px;
+  border-radius:20px;font-size:10px;font-weight:700;font-family:var(--fh)}
+.drawer-sep{height:1px;background:var(--brd);margin:8px 20px}
+
+/* ── BOTTOM NAV (4 items) ───────────────────────── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,11,20,.95);
+  backdrop-filter:blur(24px);border-top:1px solid var(--brd);
+  display:flex;justify-content:space-around;padding:8px 0 14px;z-index:100}
+[data-theme="light"] .bnav{background:rgba(240,244,255,.95)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:5px 16px;border-radius:12px;transition:all .15s}
+.ni.active{background:rgba(0,212,255,.12)}
+.nico{font-size:21px}
+.nlb{font-size:9px;font-family:var(--fh);color:var(--mut);font-weight:700;letter-spacing:.3px}
+.ni.active .nlb{color:var(--acc)}
+.nav-more-btn{display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:5px 16px;border-radius:12px;transition:all .15s}
+.nav-more-btn:active{background:rgba(0,212,255,.08)}
+.nav-more-btn .nico{font-size:21px}
+.nav-more-btn .nlb{font-size:9px;font-family:var(--fh);color:var(--mut);font-weight:700;letter-spacing:.3px}
+
+/* ── SMART HINT ─────────────────────────────────── */
+.smart-hint{position:fixed;bottom:86px;left:14px;right:14px;max-width:452px;
+  margin:0 auto;background:linear-gradient(135deg,rgba(191,95,255,.15),rgba(0,212,255,.1));
+  border:1px solid var(--ai);border-radius:14px;padding:12px 14px;z-index:300;
+  animation:slideUp .3s ease;display:none;box-shadow:var(--shadow)}
+.sh-title{font-family:var(--fh);font-size:11px;color:var(--ai);margin-bottom:4px}
+.sh-text{font-size:12px;color:var(--txt);line-height:1.4}
+.sh-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--mut);cursor:pointer;font-size:16px}
+
+/* ── API LIMIT ──────────────────────────────────── */
+.api-limit-bar{height:4px;background:var(--brd);border-radius:2px;overflow:hidden;margin-top:6px}
+.api-limit-fill{height:100%;border-radius:2px;transition:width .4s}
+.api-warn-box{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.3);
+  border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--err);display:none}
+
+/* ── MISC ───────────────────────────────────────── */
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--brd),transparent);margin:10px 0}
+.ttag{display:inline-block;padding:5px 10px;background:var(--card2);border:1px solid var(--brd);
+  border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;margin:3px 2px;transition:all .15s}
+.ttag:active{background:rgba(0,212,255,.1);border-color:var(--acc)}
+.ttag.weak{border-color:rgba(255,71,87,.3);color:var(--err)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--brd);
+  border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite}
 .spins{width:12px;height:12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.td{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:tdot 1.2s infinite;margin:0 2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.td{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--mut);
+  animation:tdot 1.2s infinite;margin:0 2px}
 .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
 @keyframes tdot{0%,100%{opacity:1}50%{opacity:.2}}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:700;font-family:var(--fh);z-index:99999;transition:transform .3s;white-space:nowrap}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:var(--card);border:1px solid var(--brd);border-radius:12px;
+  padding:10px 18px;font-size:12px;font-weight:700;font-family:var(--fh);
+  z-index:99999;transition:transform .3s;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:var(--success);color:var(--success)}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
 .toast.xp{border-color:var(--gold);color:var(--gold)}
-.einp{width:100%;padding:13px 16px;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-family:var(--fb);outline:none;margin-bottom:8px;transition:border .2s}
-.einp:focus{border-color:var(--accent)}
+.toast.err{border-color:var(--err);color:var(--err)}
+.einp{width:100%;padding:13px 16px;background:var(--card2);border:1.5px solid var(--brd);
+  border-radius:12px;color:var(--txt);font-size:14px;font-family:var(--fb);
+  outline:none;margin-bottom:8px;transition:border .2s}
+.einp:focus{border-color:var(--acc)}
 .rw{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.qrs{font-family:var(--fh);font-size:52px;font-weight:900;text-align:center;color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,0.4)}
+
+/* Plan */
+.plan-day{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:12px;margin:6px 0}
+.plan-day-title{font-family:var(--fh);font-size:11px;color:var(--acc);margin-bottom:6px}
+.plan-task{font-size:12px;color:var(--txt);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:6px}
+.plan-task:last-child{border-bottom:none}
+.tip-card{background:rgba(191,95,255,.06);border:1px solid rgba(191,95,255,.2);border-radius:10px;padding:12px;margin:6px 0}
+
+/* Theme toggle */
+.theme-toggle{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer}
+.toggle-track{width:44px;height:24px;background:var(--brd);border-radius:12px;
+  position:relative;transition:background .2s;flex-shrink:0}
+.toggle-track.on{background:var(--acc)}
+.toggle-thumb{width:20px;height:20px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle-track.on .toggle-thumb{left:22px}
+
+/* PWA install banner */
+.pwa-banner{background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(191,95,255,.08));
+  border:1px solid rgba(0,212,255,.2);border-radius:12px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pwa-icon{font-size:28px;flex-shrink:0}
+.pwa-text{flex:1}
+.pwa-title{font-family:var(--fh);font-size:11px;font-weight:700;margin-bottom:2px}
+.pwa-sub{font-size:10px;color:var(--mut)}
+
+/* Bookmark btn */
+.bookmark-btn{background:none;border:none;font-size:18px;cursor:pointer;
+  padding:4px;border-radius:6px;transition:all .15s;color:var(--mut)}
+.bookmark-btn.saved{color:var(--gold)}
+.bookmark-btn:active{transform:scale(.9)}
+
+/* Font size controls */
+.font-controls{display:flex;align-items:center;gap:8px;padding:8px 20px}
+.font-btn{background:var(--card2);border:1px solid var(--brd);border-radius:8px;
+  padding:5px 12px;cursor:pointer;font-weight:700;color:var(--txt);transition:all .15s;font-family:var(--fh)}
+.font-btn:active{background:rgba(0,212,255,.1)}
+.font-size-display{flex:1;text-align:center;font-family:var(--fh);font-size:11px;color:var(--mut)}
+
+@media(max-width:360px){.ni{padding:5px 10px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+<!-- HEADER -->
 <div class="hdr">
-  <div class="logo">&#127479;&#127482; RUSMASTER<span>ULTRA</span></div>
+  <div class="logo">&#127479;&#127482; RUS<span>MASTER</span></div>
   <div class="hdr-r">
-    <div class="lvl" onclick="openModal('mal')" id="lvl-badge">A1</div>
-    <div class="streak">&#128293; <span id="sv">0</span></div>
+    <div class="ai-status" id="ai-status-btn" onclick="openM('mapi')" title="Статус AI">
+      <div class="ai-dot" id="ai-dot"></div>
+      <span id="ai-status-txt">Офлайн</span>
+    </div>
+    <div class="lvl-pill" id="lvl-badge" onclick="openM('mal')">A1</div>
+    <div class="streak-pill">&#128293;<span id="sv">0</span></div>
   </div>
 </div>
-<div class="xp-row"><span>XP: <span id="xpv">0</span></span><span>До уровня: <span id="xpn">100</span></span></div>
-<div class="xp-bar"><div class="xp-fill" id="xpb" style="width:0%"></div></div>
+<div class="xp-wrap">
+  <div class="xp-meta"><span>XP: <span id="xpv">0</span></span><span>До уровня: <span id="xpn">100</span></span></div>
+  <div class="xp-track"><div class="xp-fill" id="xpb" style="width:0%"></div></div>
+</div>
+
+<!-- PWA BANNER -->
+<div class="pwa-banner" id="pwa-banner" style="display:none">
+  <div class="pwa-icon">&#128241;</div>
+  <div class="pwa-text">
+    <div class="pwa-title">Установить как приложение</div>
+    <div class="pwa-sub">Работает офлайн, быстрее загружается</div>
+  </div>
+  <button class="btn bp bsm" onclick="installPWA()" style="flex-shrink:0">Установить</button>
+  <button onclick="hidePWA()" style="background:none;border:none;color:var(--mut);cursor:pointer;font-size:18px;margin-left:4px">&#10005;</button>
+</div>
 
 <!-- ГЛАВНАЯ -->
 <div id="s-home" class="screen active">
   <div class="hero">
-    <div class="hring">
-      <svg width="90" height="90" viewBox="0 0 90 90">
-        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#BF5FFF"/>
-        </linearGradient></defs>
-        <circle class="rbg" cx="45" cy="45" r="38"/>
-        <circle class="rfill" cx="45" cy="45" r="38" stroke-dasharray="238.8" stroke-dashoffset="238.8" id="rp"/>
-      </svg>
-      <div class="rpct" id="hpct">0%</div>
-    </div>
+    <div class="hring"><svg width="88" height="88" viewBox="0 0 88 88">
+      <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#BF5FFF"/>
+      </linearGradient></defs>
+      <circle class="rbg" cx="44" cy="44" r="37"/>
+      <circle class="rfill" cx="44" cy="44" r="37" stroke-dasharray="232.5" stroke-dashoffset="232.5" id="rp"/>
+    </svg><div class="rpct" id="hpct">0%</div></div>
     <div class="htitle">Прогресс курса</div>
     <div class="hsub" id="hsub">Начните первый урок прямо сейчас</div>
     <button class="btn bg" onclick="startSession()">&#9654; НАЧАТЬ ОБУЧЕНИЕ</button>
@@ -211,60 +524,61 @@ textarea.ti:focus{border-color:var(--accent)}
   <div class="card">
     <div class="ct">&#9889; МЕТОД ОБУЧЕНИЯ</div>
     <div class="mgrid">
-      <div class="mc active" id="m-spaced" onclick="setMethod('spaced')">
-        <div class="mi">&#129504;</div>
-        <div class="mn">ИНТЕРВАЛЫ</div>
-        <div class="md">Spaced repetition — в 5x быстрее</div>
-      </div>
-      <div class="mc" id="m-immersion" onclick="setMethod('immersion')">
-        <div class="mi">&#127754;</div>
-        <div class="mn">ПОГРУЖЕНИЕ</div>
-        <div class="md">Только русский — думаем на языке</div>
-      </div>
-      <div class="mc" id="m-chunks" onclick="setMethod('chunks')">
-        <div class="mi">&#129513;</div>
-        <div class="mn">ЧАНКИ</div>
-        <div class="md">Готовые фразы вместо правил</div>
-      </div>
-      <div class="mc" id="m-shadowing" onclick="setMethod('shadowing')">
-        <div class="mi">&#128483;</div>
-        <div class="mn">ШЭДОУИНГ</div>
-        <div class="md">Произношение как у носителя</div>
-      </div>
+      <div class="mc active" id="m-spaced" onclick="setMethod('spaced')"><div class="mi">&#129504;</div><div class="mn">ИНТЕРВАЛЫ</div><div class="md">Spaced repetition — 5x быстрее</div></div>
+      <div class="mc" id="m-immersion" onclick="setMethod('immersion')"><div class="mi">&#127754;</div><div class="mn">ПОГРУЖЕНИЕ</div><div class="md">Только русский язык</div></div>
+      <div class="mc" id="m-chunks" onclick="setMethod('chunks')"><div class="mi">&#129513;</div><div class="mn">ЧАНКИ</div><div class="md">Готовые фразы вместо правил</div></div>
+      <div class="mc" id="m-shadowing" onclick="setMethod('shadowing')"><div class="mi">&#128483;</div><div class="mn">ШЭДОУИНГ</div><div class="md">Произношение носителя</div></div>
     </div>
     <button class="btn bp" onclick="startSession()">&#128640; СЕССИЯ СЕГОДНЯ</button>
   </div>
 
-  <div class="card">
-    <div class="ct">&#128197; ПЛАН НА СЕГОДНЯ</div>
-    <ul id="plan" style="padding-left:18px;color:var(--muted);line-height:1.9;font-size:12px"></ul>
+  <div class="card"><div class="ct">&#128197; ПЛАН НА СЕГОДНЯ</div>
+    <ul id="plan" style="padding-left:18px;color:var(--mut);line-height:1.9;font-size:12px"></ul>
   </div>
 
-  <div class="card">
-    <div class="ct">&#128293; ПОВТОРИТЬ СЕЙЧАС</div>
-    <div class="srb">
-      <div class="srn" id="src">0</div>
-      <div class="srl">карточек ждут повторения</div>
+  <div class="card"><div class="ct">&#128293; ПОВТОРИТЬ СЕЙЧАС</div>
+    <div class="srb"><div class="srn" id="src">0</div><div class="srl">карточек ждут повторения</div>
       <button class="btn bg" onclick="startFC()" id="srbtn" style="display:none;margin-top:8px">Повторить &#8594;</button>
     </div>
   </div>
 
-  <div class="card">
-    <div class="ct">&#127919; ЕЖЕДНЕВНЫЙ ТЕСТ</div>
-    <p>10 вопросов с выбором ответа. AI генерирует по вашим слабым темам.</p>
-    <button class="btn bai" onclick="gotoQuiz()">&#127919; Начать тест</button>
+  <div class="card"><div class="ct">&#127919; ЕЖЕДНЕВНЫЙ ТЕСТ</div>
+    <p>10 вопросов. AI генерирует по вашим слабым темам.</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn bai" style="flex:2" onclick="nav('s-quiz','n-quiz');loadQuiz()">&#127919; Начать тест</button>
+      <button class="btn bo" style="flex:1" onclick="nav('s-dialog','n-more');initDialogScenes()">&#128172; Диалог</button>
+    </div>
+  </div>
+
+  <!-- График XP -->
+  <div class="chart-wrap">
+    <div class="chart-title">&#128200; XP ЗА ПОСЛЕДНИЕ 7 ДНЕЙ</div>
+    <div class="chart-bars" id="xp-chart"></div>
+    <div class="chart-labels" id="xp-labels"></div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,rgba(191,95,255,.1),rgba(0,212,255,.05));border-color:rgba(191,95,255,.3)">
+    <div class="ct">&#129504;&#10024; УМНЫЙ AI-ПЛАН</div>
+    <p>Персональный план на 7 дней по вашим ошибкам.</p>
+    <button class="btn bai" onclick="nav('s-aiplan','n-more')">&#9889; Мой план</button>
   </div>
 </div>
 
 <!-- КУРС -->
 <div id="s-learn" class="screen">
   <div class="card">
-    <div class="ct">&#128269; ЛЮБАЯ ТЕМА</div>
-    <input class="einp" id="ftopic" placeholder="Например: падежи, глаголы движения, числительные...">
+    <div class="ct">&#128269; ПОИСК ПО КУРСУ</div>
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input class="search-inp" id="search-inp" placeholder="Поиск темы..." oninput="searchCurr(this.value)">
+    </div>
+    <input class="einp" id="ftopic" placeholder="Или введите любую тему для AI-урока...">
     <button class="btn bp" onclick="loadFree()">&#129504; AI: Сгенерировать урок</button>
   </div>
   <div class="card" style="padding:12px">
     <div class="ct">&#128218; ПРОГРАММА КУРСА</div>
+    <!-- Progress bars per module -->
+    <div id="module-progress" style="margin-bottom:12px"></div>
     <div id="clist"></div>
   </div>
 </div>
@@ -272,36 +586,38 @@ textarea.ti:focus{border-color:var(--accent)}
 <!-- УРОК -->
 <div id="s-lesson" class="screen">
   <div class="lnav">
-    <button onclick="goBack()">&#9664; Назад</button>
-    <span id="lpos">1/32</span>
-    <button onclick="nextLesson()">Далее &#9654;</button>
+    <button class="lnav-btn" onclick="goBack()">&#9664; Назад</button>
+    <span class="lpos" id="lpos">1/32</span>
+    <div style="display:flex;gap:6px">
+      <button class="bookmark-btn" id="bmark-btn" onclick="toggleBookmark()" title="Закладка">&#9825;</button>
+      <button class="lnav-btn" onclick="nextLesson()">Далее &#9654;</button>
+    </div>
   </div>
+  <div class="les-prog"><div class="les-prog-fill" id="les-prog-fill" style="width:0%"></div></div>
   <div class="card">
     <div id="ltitle" class="ct"></div>
     <div id="lcont"></div>
   </div>
   <div style="display:flex;gap:8px">
-    <button class="btn bo" style="flex:1" onclick="goBack()">&#9664; Назад</button>
-    <button class="btn bp" style="flex:2" onclick="nextLesson()">Следующий урок &#9654;</button>
+    <button class="btn bo" style="flex:1" onclick="retakeLesson()">&#128260; Повтор</button>
+    <button class="btn bp" style="flex:2" onclick="nextLesson()">Следующий &#9654;</button>
   </div>
 </div>
 
 <!-- ТЕСТ -->
 <div id="s-quiz" class="screen">
-  <div class="card">
-    <div class="ct">&#127919; ЕЖЕДНЕВНЫЙ ТЕСТ</div>
-    <div id="qcont"><div style="text-align:center;padding:30px;color:var(--muted)">Загрузка теста...</div></div>
+  <div class="card"><div class="ct">&#127919; ЕЖЕДНЕВНЫЙ ТЕСТ</div>
+    <div id="qcont"><div style="text-align:center;padding:30px;color:var(--mut)">Загрузка...</div></div>
   </div>
 </div>
 
 <!-- КАРТОЧКИ -->
 <div id="s-fc" class="screen">
-  <div class="card">
-    <div class="ct">&#127183; КАРТОЧКИ ПОВТОРЕНИЯ</div>
+  <div class="card"><div class="ct">&#127183; КАРТОЧКИ ПОВТОРЕНИЯ</div>
     <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:11px;color:var(--muted)">Осталось: <strong id="fcrem">0</strong></span>
-      <span style="font-size:11px;color:var(--success)">Верно: <strong id="fcok">0</strong></span>
-      <span style="font-size:11px;color:var(--error)">Снова: <strong id="fcag">0</strong></span>
+      <span style="font-size:11px;color:var(--mut)">Осталось: <strong id="fcrem">0</strong></span>
+      <span style="font-size:11px;color:var(--ok)">Верно: <strong id="fcok">0</strong></span>
+      <span style="font-size:11px;color:var(--err)">Снова: <strong id="fcag">0</strong></span>
     </div>
     <div class="fc" id="fccard" onclick="flipFC()">
       <div class="fcf" id="fcf">—</div>
@@ -316,856 +632,1507 @@ textarea.ti:focus{border-color:var(--accent)}
   </div>
 </div>
 
-<!-- ПРОВЕРКА ТЕКСТА -->
+<!-- ТЕКСТ -->
 <div id="s-text" class="screen">
-  <div class="card">
-    <div class="ct">&#128221; ПРОВЕРКА ТЕКСТА</div>
-    <p>Вставьте любой текст. AI исправит каждую ошибку и объяснит правило.</p>
+  <div class="card"><div class="ct">&#128221; ПРОВЕРКА ТЕКСТА</div>
+    <p>Вставьте любой текст. AI исправит и объяснит каждую ошибку.</p>
     <textarea class="ti" id="tinp" placeholder="Ваш текст на русском языке..."></textarea>
     <div style="display:flex;gap:8px;margin-top:8px">
       <button class="btn bp" id="chkbtn" onclick="checkText()" style="flex:2">&#128269; Анализировать</button>
-      <button class="btn bo" onclick="document.getElementById('tinp').value=''" style="flex:1">Очистить</button>
+      <button class="btn bo" onclick="clearText()" style="flex:1">Очистить</button>
     </div>
     <div id="tres" class="rb" style="display:none"></div>
   </div>
 </div>
 
-<!-- AI ЧАТ -->
+<!-- ЧАТ -->
 <div id="s-chat" class="screen">
-  <div class="card" style="flex:1">
-    <div class="ct">&#129504; AI-РЕПЕТИТОР</div>
+  <div class="card"><div class="ct">&#129504; AI-РЕПЕТИТОР</div>
     <div class="cw" id="chatw">
-      <div class="msg ai"><strong>&#129504; AI:</strong> Привет! Я ваш репетитор по русскому языку. Задавайте любые вопросы — о падежах, глаголах, произношении. Также могу проверить ваши фразы на ошибки.</div>
+      <div class="msg ai"><strong>&#129504; AI:</strong> Привет! Я репетитор по русскому. Задавайте вопросы о падежах, глаголах, произношении. Проверю ваши фразы на ошибки.</div>
     </div>
     <div class="sep"></div>
     <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
-      <span class="ttag" onclick="quickAsk('Объясни все 6 падежей русского языка с примерами')">Падежи</span>
-      <span class="ttag" onclick="quickAsk('В чём разница между НСВ и СВ глаголов?')">НСВ / СВ</span>
-      <span class="ttag" onclick="quickAsk('Как образуется прошедшее время глаголов?')">Прошедшее время</span>
-      <span class="ttag" onclick="quickAsk('Основные фразы приветствия и прощания')">Приветствия</span>
+      <span class="ttag" onclick="quickAsk('Объясни все 6 падежей с примерами')">Падежи</span>
+      <span class="ttag" onclick="quickAsk('В чём разница НСВ и СВ?')">НСВ/СВ</span>
+      <span class="ttag" onclick="quickAsk('Как образуется прошедшее время?')">Прошедшее</span>
+      <span class="ttag" onclick="quickAsk('Фразы приветствия и прощания')">Приветствия</span>
     </div>
     <div class="crow">
       <input class="ci" id="cinp" placeholder="Задайте вопрос...">
-      <button class="sb" onclick="sendChat()">&#10148;</button>
+      <button class="sbtn" onclick="sendChat()">&#10148;</button>
     </div>
   </div>
 </div>
 
 <!-- ПРОГРЕСС -->
 <div id="s-prog" class="screen">
-  <div class="card">
-    <div class="ct">&#128202; МОЙ ПРОГРЕСС</div>
+  <div class="card"><div class="ct">&#128202; МОЙ ПРОГРЕСС</div>
     <div class="sgrid" id="sgrid"></div>
+    <!-- Progress bars -->
+    <div id="prog-bars" style="margin-bottom:12px"></div>
     <div class="ct" style="margin-top:4px">&#128197; Активность (28 дней)</div>
     <div class="hmap" id="hmap"></div>
+    <!-- XP Chart -->
+    <div class="chart-wrap" style="margin-top:10px">
+      <div class="chart-title">&#128200; XP ПО ДНЯМ</div>
+      <div class="chart-bars" id="prog-chart"></div>
+      <div class="chart-labels" id="prog-labels"></div>
+    </div>
   </div>
-  <div class="card">
-    <div class="ct">&#9888; СЛАБЫЕ ТЕМЫ</div>
-    <div id="wlist" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+  <div class="card"><div class="ct">&#9888; СЛАБЫЕ ТЕМЫ</div><div id="wlist"></div></div>
+  <div class="card"><div class="ct">&#128215; ЗАКЛАДКИ</div><div id="bookmarks-list"></div></div>
+  <!-- API LIMIT -->
+  <div class="card"><div class="ct">&#128273; СТАТУС API</div>
+    <div id="api-info-block">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+        <span>Запросы сегодня</span><span id="api-count-txt" style="font-weight:700;color:var(--acc)">0</span>
+      </div>
+      <div class="api-limit-bar"><div class="api-limit-fill" id="api-limit-fill" style="width:0%"></div></div>
+      <div class="api-warn-box" id="api-warn">⚠️ Вы использовали много запросов сегодня. При превышении лимита уроки будут загружаться из кэша.</div>
+    </div>
   </div>
-  <div class="card">
-    <div class="ct">&#9881; НАСТРОЙКИ</div>
+  <div class="card"><div class="ct">&#9881; НАСТРОЙКИ</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn bo bsm" onclick="openModal('mapi')">&#128273; API ключ</button>
-      <button class="btn bo bsm" onclick="openModal('mal')">&#128202; Уровень</button>
+      <button class="btn bo bsm" onclick="openM('mapi')">&#128273; API ключ</button>
+      <button class="btn bo bsm" onclick="openM('mal')">&#128202; Уровень</button>
+      <button class="btn bo bsm" onclick="exportData()">&#128229; Экспорт</button>
+      <button class="btn bo bsm" onclick="importData()">&#128228; Импорт</button>
       <button class="btn bo bsm" onclick="doReport()">&#128196; Отчёт</button>
       <button class="btn bred bsm" onclick="doReset()">&#128260; Сброс</button>
     </div>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
   </div>
 </div>
+
+<!-- ЕЩЁ (ДОПОЛНИТЕЛЬНЫЕ ЭКРАНЫ) -->
+<div id="s-more" class="screen">
+  <div class="card"><div class="ct">&#128640; ВСЕ ФУНКЦИИ</div>
+    <div style="display:grid;gap:8px">
+      <button class="btn bp" onclick="nav('s-dialog','n-more');initDialogScenes()">&#128172; Диалоговые сценарии</button>
+      <button class="btn bp" onclick="nav('s-dictation','n-more')">&#127908; Диктант</button>
+      <button class="btn bai" onclick="nav('s-aiplan','n-more')">&#129504;&#10024; Персональный план AI</button>
+      <button class="btn bo" onclick="nav('s-fc','n-more');startFC()">&#127183; Карточки повторения</button>
+    </div>
+  </div>
 </div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
+<!-- ДИАЛОГ -->
+<div id="s-dialog" class="screen">
+  <div class="card" id="dial-scenes-card">
+    <div class="ct">&#128172; ДИАЛОГОВЫЕ СЦЕНАРИИ</div>
+    <p>Выберите сценарий. AI играет роль и исправляет ошибки в диалоге.</p>
+    <div class="scene-grid" id="dial-scenes"></div>
+  </div>
+  <div class="card" id="dial-chat-card" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="ct" id="dial-title" style="margin-bottom:0">Диалог</div>
+      <button class="btn bo bsm" onclick="resetDialog()">&#128260; Сменить</button>
+    </div>
+    <div style="font-size:11px;color:var(--acc);margin-bottom:8px;font-family:var(--fh)" id="dial-role"></div>
+    <div class="dial-msgs" id="dial-msgs"></div>
+    <div style="background:rgba(255,179,0,.06);border:1px solid rgba(255,179,0,.2);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--warn)" id="dial-tip">💡 Пишите на русском. AI исправит ошибки в скобках.</div>
+    <div class="crow">
+      <input class="ci" id="dial-inp" placeholder="Ваш ответ на русском...">
+      <button class="sbtn" onclick="sendDialog()">&#10148;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ДИКТАНТ -->
+<div id="s-dictation" class="screen">
+  <div class="card">
+    <div class="ct">&#127908; ДИКТАНТ</div>
+    <p>AI произносит — вы пишете. Тренирует слух и орфографию.</p>
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button class="btn bo bsm" onclick="setDictLv('words')" id="dlv-words" style="flex:1">Слова</button>
+      <button class="btn bo bsm" onclick="setDictLv('phrases')" id="dlv-phrases" style="flex:1">Фразы</button>
+      <button class="btn bo bsm" onclick="setDictLv('sentences')" id="dlv-sentences" style="flex:1">Предложения</button>
+    </div>
+    <div class="dict-card">
+      <div class="dict-status" id="dict-status">Нажмите ▶ для начала</div>
+      <button class="btn bp" onclick="playDictation()" id="dict-play-btn" style="width:auto;padding:10px 28px">&#9654; Слушать</button>
+    </div>
+    <input class="prac-inp" id="dict-inp" placeholder="Напишите что услышали..." style="font-size:15px;text-align:center;margin-bottom:8px" autocomplete="off">
+    <div id="dict-feed" style="min-height:20px;font-size:13px;margin-bottom:10px;text-align:center"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn bp" onclick="checkDictation()" style="flex:2">&#10003; Проверить</button>
+      <button class="btn bo" onclick="playDictation()" style="flex:1">&#128266; Ещё раз</button>
+    </div>
+    <div class="dict-stats" style="margin-top:14px">
+      <div class="dict-stat"><div class="dict-stat-n" style="color:var(--ok)" id="d-ok">0</div><div class="dict-stat-l">ВЕРНО</div></div>
+      <div class="dict-stat"><div class="dict-stat-n" style="color:var(--err)" id="d-err">0</div><div class="dict-stat-l">ОШИБОК</div></div>
+      <div class="dict-stat"><div class="dict-stat-n" style="color:var(--acc)" id="d-streak">0</div><div class="dict-stat-l">СЕРИЯ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI ПЛАН -->
+<div id="s-aiplan" class="screen">
+  <div class="card">
+    <div class="ct">&#129504;&#10024; ПЕРСОНАЛЬНЫЙ ПЛАН AI</div>
+    <p>AI анализирует ваш прогресс и составляет план на 7 дней.</p>
+    <button class="btn bai" id="gen-plan-btn" onclick="generatePlan()">&#9889; Сгенерировать план</button>
+  </div>
+  <div id="plan-result" style="display:none">
+    <div class="card" id="plan-analysis"><div class="ct">&#128202; АНАЛИЗ</div><div id="plan-analysis-content"></div></div>
+    <div class="card" id="plan-week"><div class="ct">&#128197; ПЛАН НА 7 ДНЕЙ</div><div id="plan-week-content"></div></div>
+    <div class="card" id="plan-tips"><div class="ct">&#128161; УМНЫЕ ПОДСКАЗКИ</div><div id="plan-tips-content"></div></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- BOTTOM NAV (4 items + more) -->
 <div class="bnav">
-  <div class="ni active" id="n-home" onclick="gotoHome()"><div class="nico">&#127968;</div><div class="nlb">СТАРТ</div></div>
-  <div class="ni" id="n-learn" onclick="gotoLearn()"><div class="nico">&#128218;</div><div class="nlb">КУРС</div></div>
-  <div class="ni" id="n-quiz" onclick="gotoQuiz()"><div class="nico">&#127919;</div><div class="nlb">ТЕСТ</div></div>
-  <div class="ni" id="n-text" onclick="gotoText()"><div class="nico">&#128221;</div><div class="nlb">ТЕКСТ</div></div>
-  <div class="ni" id="n-chat" onclick="gotoChat()"><div class="nico">&#129504;</div><div class="nlb">AI</div></div>
-  <div class="ni" id="n-prog" onclick="gotoProg()"><div class="nico">&#128202;</div><div class="nlb">ПРОГРЕСС</div></div>
+  <div class="ni active" id="n-home" onclick="nav('s-home','n-home')"><div class="nico">&#127968;</div><div class="nlb">СТАРТ</div></div>
+  <div class="ni" id="n-learn" onclick="nav('s-learn','n-learn');renderCurr()"><div class="nico">&#128218;</div><div class="nlb">КУРС</div></div>
+  <div class="ni" id="n-chat" onclick="nav('s-chat','n-chat')"><div class="nico">&#129504;</div><div class="nlb">AI</div></div>
+  <div class="ni" id="n-prog" onclick="nav('s-prog','n-prog')"><div class="nico">&#128202;</div><div class="nlb">ПРОГРЕСС</div></div>
+  <div class="nav-more-btn" onclick="openDrawer()"><div class="nico">&#9776;</div><div class="nlb">ЕЩЁ</div></div>
 </div>
 
-<!-- МОДАЛКА API -->
+<!-- DRAWER MENU -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-logo">&#127479;&#127482; RUSMASTER ULTRA</div>
+    <button class="drawer-close" onclick="closeDrawer()">&#10005;</button>
+  </div>
+  <div class="drawer-section">ОБУЧЕНИЕ</div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-quiz','n-more');loadQuiz()"><span class="di-icon">&#127919;</span><span class="di-lbl">Ежедневный тест</span></div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-fc','n-more');startFC()"><span class="di-icon">&#127183;</span><span class="di-lbl">Карточки повторения</span></div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-dialog','n-more');initDialogScenes()"><span class="di-icon">&#128172;</span><span class="di-lbl">Диалоговые сценарии</span></div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-dictation','n-more')"><span class="di-icon">&#127908;</span><span class="di-lbl">Диктант</span></div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-text','n-more')"><span class="di-icon">&#128221;</span><span class="di-lbl">Проверка текста</span></div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-section">AI</div>
+  <div class="drawer-item" onclick="closeDrawer();nav('s-aiplan','n-more')"><span class="di-icon">&#10024;</span><span class="di-lbl">Персональный план</span></div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-section">НАСТРОЙКИ</div>
+  <!-- Theme toggle -->
+  <div class="theme-toggle" onclick="toggleTheme()">
+    <span style="font-size:18px" id="theme-icon">&#127769;</span>
+    <span style="font-size:13px;font-weight:600;flex:1" id="theme-lbl">Тёмная тема</span>
+    <div class="toggle-track" id="theme-track"><div class="toggle-thumb"></div></div>
+  </div>
+  <!-- Font size -->
+  <div class="font-controls">
+    <button class="font-btn" onclick="changeFontSize(-1)">А-</button>
+    <div class="font-size-display" id="font-size-display">Размер шрифта: 100%</div>
+    <button class="font-btn" onclick="changeFontSize(1)">А+</button>
+  </div>
+  <div class="drawer-item" onclick="closeDrawer();openM('mapi')"><span class="di-icon">&#128273;</span><span class="di-lbl">API ключ</span><span class="di-badge" id="drawer-ai-badge">Офлайн</span></div>
+  <div class="drawer-item" onclick="closeDrawer();openM('mal')"><span class="di-icon">&#128202;</span><span class="di-lbl">Уровень</span><span class="di-badge" id="drawer-lv-badge">A1</span></div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-item" onclick="closeDrawer();exportData()"><span class="di-icon">&#128229;</span><span class="di-lbl">Экспорт данных</span></div>
+  <div class="drawer-item" onclick="closeDrawer();importData()"><span class="di-icon">&#128228;</span><span class="di-lbl">Импорт данных</span></div>
+  <div class="drawer-sep"></div>
+  <div class="drawer-item" onclick="closeDrawer();doReset()" style="color:var(--err)"><span class="di-icon">&#128260;</span><span class="di-lbl">Сброс прогресса</span></div>
+</div>
+
+<!-- MODALS -->
 <div class="ov" id="mapi" style="display:none">
   <div class="modal">
     <div class="mt">&#128273; ПОДКЛЮЧИТЬ AI</div>
-    <div class="ms">
-      Используйте бесплатный ключ <strong style="color:var(--accent)">Groq</strong> — работает мгновенно из браузера.<br><br>
-      &#128203; Как получить:<br>
+    <div class="ms">Используйте бесплатный ключ <strong style="color:var(--acc)">Groq</strong>.<br><br>
       1. Перейдите на <strong>console.groq.com</strong><br>
-      2. Войдите → API Keys → Create API Key<br>
-      3. Скопируйте ключ <strong>gsk_...</strong> и вставьте ниже<br><br>
-      <span style="color:var(--warn)">&#9888; Ключ Anthropic (sk-ant-...) не работает из браузера — это ограничение CORS.</span>
+      2. API Keys → Create API Key<br>
+      3. Скопируйте ключ <strong>gsk_...</strong><br><br>
+      <span style="color:var(--warn)">&#9888; Ключ Anthropic (sk-ant-...) не работает из браузера.</span>
     </div>
-    <input class="mi2" id="apiinp" placeholder="gsk_xxxxxxxxxxxx (Groq)" type="password" autocomplete="off">
+    <input class="mi" id="apiinp" placeholder="gsk_xxxxxxxxxxxx (Groq)" type="password" autocomplete="off">
     <div class="merr" id="apierr"></div>
-    <button class="btn bp" onclick="doValidateKey()" style="margin-bottom:8px">&#10003; Подключить</button>
-    <button class="btn bo" onclick="doOffline()" style="font-size:11px;padding:9px">&#127760; Офлайн режим (базовые уроки)</button>
+    <button class="btn bp" onclick="doKey()" style="margin-bottom:8px">&#10003; Подключить</button>
+    <button class="btn bo" onclick="doOffline()" style="font-size:11px;padding:9px">&#127760; Офлайн режим</button>
   </div>
 </div>
-
-<!-- МОДАЛКА УРОВЕНЬ -->
 <div class="ov" id="mal" style="display:none">
   <div class="modal">
     <div class="mt">&#128202; ВАШ УРОВЕНЬ</div>
-    <div class="ms">Выберите текущий уровень. AI адаптирует сложность уроков и тестов.</div>
+    <div class="ms">AI адаптирует сложность уроков и тестов.</div>
     <div class="lgrid">
-      <div class="lo" onclick="doSetLevel('A1')" id="la1"><div class="lon">A1</div><div class="lod">Начинающий</div></div>
-      <div class="lo" onclick="doSetLevel('A2')" id="la2"><div class="lon">A2</div><div class="lod">Элементарный</div></div>
-      <div class="lo" onclick="doSetLevel('B1')" id="lb1"><div class="lon">B1</div><div class="lod">Средний</div></div>
-      <div class="lo" onclick="doSetLevel('B2')" id="lb2"><div class="lon">B2</div><div class="lod">Выше среднего</div></div>
-      <div class="lo" onclick="doSetLevel('C1')" id="lc1"><div class="lon">C1</div><div class="lod">Продвинутый</div></div>
-      <div class="lo" onclick="doSetLevel('C2')" id="lc2"><div class="lon">C2</div><div class="lod">Мастер</div></div>
+      <div class="lo" onclick="setLv('A1')" id="la1"><div class="lon">A1</div><div class="lod">Начинающий</div></div>
+      <div class="lo" onclick="setLv('A2')" id="la2"><div class="lon">A2</div><div class="lod">Элементарный</div></div>
+      <div class="lo" onclick="setLv('B1')" id="lb1"><div class="lon">B1</div><div class="lod">Средний</div></div>
+      <div class="lo" onclick="setLv('B2')" id="lb2"><div class="lon">B2</div><div class="lod">Выше среднего</div></div>
+      <div class="lo" onclick="setLv('C1')" id="lc1"><div class="lon">C1</div><div class="lod">Продвинутый</div></div>
+      <div class="lo" onclick="setLv('C2')" id="lc2"><div class="lon">C2</div><div class="lod">Мастер</div></div>
     </div>
-    <button class="btn bp" onclick="closeModal('mal')">Сохранить</button>
+    <button class="btn bp" onclick="closeM('mal')">Сохранить</button>
   </div>
 </div>
 
+<!-- SMART HINT BANNER -->
+<div class="smart-hint" id="smart-hint-banner">
+  <button class="sh-close" onclick="closeSmartHint()">&#10005;</button>
+  <div class="sh-title" id="sh-title-text">&#128161; Умная подсказка</div>
+  <div class="sh-text" id="sh-text-content"></div>
+  <button class="btn bp bsm" onclick="closeSmartHint();nav('s-aiplan','n-more')" style="margin-top:8px;width:auto;padding:6px 12px;font-size:10px">Открыть план &#8594;</button>
+</div>
 <div class="toast" id="toast"></div>
 <script>
-const S={
-  key:'',offline:false,level:'A1',
-  streak:0,lastDate:null,xp:0,xpLevel:1,
-  progress:0,completed:[],weak:[],method:'spaced',
-  cache:{},history:[],
-  cards:[],fcQ:[],fcI:0,fcFlip:false,fcOk:0,fcAg:0,
-  topic:null,topicIdx:0,
-  log:{},quizDone:false,quizDate:null
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+var S = {
+  key:'', offline:false, level:'A1',
+  streak:0, lastDate:null, xp:0, xpLv:1,
+  progress:0, done:[], weak:[], method:'spaced',
+  cache:{}, history:[], bookmarks:[],
+  cards:[], fcQ:[], fcI:0, fcFlip:false, fcOk:0, fcAg:0,
+  topic:null, topicI:0,
+  log:{}, xpLog:{}, // date->xp
+  quizDone:false, quizDate:null,
+  theme:'dark', fontSize:100,
+  apiCount:0, apiDate:null, // daily request counter
+  errLog:{} // topic->count for smart hints
 };
 
-const MODS=[
-  {n:'ОСНОВЫ',t:[
+// ═══════════════════════════════════════════════════════
+// CURRICULUM
+// ═══════════════════════════════════════════════════════
+var MODS = [
+  {n:'ОСНОВЫ', t:[
     {id:'alphabet',t:'🔤 Алфавит и произношение',d:'A1'},
-    {id:'stress',t:'🎵 Ударение и интонация',d:'A1'},
-    {id:'reading',t:'📖 Чтение и транслитерация',d:'A1'},
+    {id:'stress',  t:'🎵 Ударение и интонация',  d:'A1'},
+    {id:'reading', t:'📖 Чтение и транслитерация',d:'A1'}
   ]},
-  {n:'СУЩЕСТВИТЕЛЬНЫЕ',t:[
-    {id:'gender',t:'🧬 Род существительных',d:'A1'},
-    {id:'plural',t:'🔢 Множественное число',d:'A1'},
-    {id:'diminutive',t:'🌸 Уменьшительные формы',d:'A2'},
+  {n:'СУЩЕСТВИТЕЛЬНЫЕ', t:[
+    {id:'gender', t:'🧬 Род существительных', d:'A1'},
+    {id:'plural', t:'🔢 Множественное число',  d:'A1'},
+    {id:'dimin',  t:'🌸 Уменьшительные формы',d:'A2'}
   ]},
-  {n:'МЕСТОИМЕНИЯ',t:[
-    {id:'pron_p',t:'👤 Личные местоимения',d:'A1'},
+  {n:'МЕСТОИМЕНИЯ', t:[
+    {id:'pron_p',  t:'👤 Личные местоимения',        d:'A1'},
     {id:'pron_pos',t:'🔐 Притяжательные местоимения',d:'A1'},
-    {id:'pron_ref',t:'🪞 Возвратные местоимения',d:'B1'},
+    {id:'pron_ref',t:'🪞 Возвратные местоимения',    d:'B1'}
   ]},
-  {n:'ГЛАГОЛЫ',t:[
-    {id:'v_pres',t:'⏱ Настоящее время',d:'A1'},
-    {id:'v_past',t:'⏪ Прошедшее время',d:'A1'},
-    {id:'v_fut',t:'⏩ Будущее время',d:'A2'},
-    {id:'v_asp',t:'🔄 Вид глагола: НСВ / СВ',d:'B1'},
-    {id:'v_ref',t:'🔁 Возвратные глаголы -ся/-сь',d:'B1'},
-    {id:'v_mot',t:'🚶 Глаголы движения',d:'B1'},
-    {id:'v_imp',t:'❗ Повелительное наклонение',d:'A2'},
-    {id:'v_c1',t:'🔵 Спряжение I тип',d:'A1'},
-    {id:'v_c2',t:'🟡 Спряжение II тип',d:'A2'},
+  {n:'ГЛАГОЛЫ', t:[
+    {id:'v_pres',t:'⏱ Настоящее время',          d:'A1'},
+    {id:'v_past',t:'⏪ Прошедшее время',           d:'A1'},
+    {id:'v_fut', t:'⏩ Будущее время',             d:'A2'},
+    {id:'v_asp', t:'🔄 Вид глагола: НСВ / СВ',   d:'B1'},
+    {id:'v_ref', t:'🔁 Возвратные глаголы -ся',  d:'B1'},
+    {id:'v_mot', t:'🚶 Глаголы движения',         d:'B1'},
+    {id:'v_imp', t:'❗ Повелительное наклонение', d:'A2'},
+    {id:'v_c1',  t:'🔵 Спряжение I тип',          d:'A1'},
+    {id:'v_c2',  t:'🟡 Спряжение II тип',         d:'A2'}
   ]},
-  {n:'ПАДЕЖИ',t:[
-    {id:'c_nom',t:'🗝️ Именительный падеж',d:'A1'},
-    {id:'c_gen',t:'🗝️ Родительный падеж',d:'A2'},
-    {id:'c_dat',t:'🗝️ Дательный падеж',d:'A2'},
-    {id:'c_acc',t:'🗝️ Винительный падеж',d:'A2'},
-    {id:'c_ins',t:'🗝️ Творительный падеж',d:'B1'},
-    {id:'c_pre',t:'🗝️ Предложный падеж',d:'A2'},
-    {id:'c_all',t:'⚡ Все падежи: сводная таблица',d:'B1'},
+  {n:'ПАДЕЖИ', t:[
+    {id:'c_nom',t:'🗝️ Именительный падеж',        d:'A1'},
+    {id:'c_gen',t:'🗝️ Родительный падеж',         d:'A2'},
+    {id:'c_dat',t:'🗝️ Дательный падеж',           d:'A2'},
+    {id:'c_acc',t:'🗝️ Винительный падеж',         d:'A2'},
+    {id:'c_ins',t:'🗝️ Творительный падеж',        d:'B1'},
+    {id:'c_pre',t:'🗝️ Предложный падеж',          d:'A2'},
+    {id:'c_all',t:'⚡ Все падежи: сводная таблица',d:'B1'}
   ]},
-  {n:'ПРИЛАГАТЕЛЬНЫЕ И НАРЕЧИЯ',t:[
-    {id:'adj',t:'🎨 Согласование прилагательных',d:'A2'},
-    {id:'comp',t:'📈 Сравнительная степень',d:'B1'},
-    {id:'adv',t:'💨 Наречия',d:'B1'},
+  {n:'ПРИЛАГАТЕЛЬНЫЕ', t:[
+    {id:'adj', t:'🎨 Согласование прилагательных',d:'A2'},
+    {id:'comp',t:'📈 Сравнительная степень',       d:'B1'},
+    {id:'adv', t:'💨 Наречия',                    d:'B1'}
   ]},
-  {n:'ЧИСЛА И ВРЕМЯ',t:[
-    {id:'nums',t:'🔢 Числительные',d:'A2'},
-    {id:'time',t:'⏰ Время суток',d:'A1'},
-    {id:'dates',t:'📅 Даты и месяцы',d:'A2'},
+  {n:'ЧИСЛА И ВРЕМЯ', t:[
+    {id:'nums', t:'🔢 Числительные',  d:'A2'},
+    {id:'time', t:'⏰ Время суток',   d:'A1'},
+    {id:'dates',t:'📅 Даты и месяцы',d:'A2'}
   ]},
-  {n:'ОБЩЕНИЕ',t:[
+  {n:'ОБЩЕНИЕ', t:[
     {id:'greet',t:'👋 Приветствия и прощания',d:'A1'},
-    {id:'self',t:'🗣️ Рассказ о себе',d:'A1'},
-    {id:'shop',t:'🛒 Магазин и покупки',d:'A2'},
-    {id:'trans',t:'🚌 Транспорт и дорога',d:'A2'},
-    {id:'rest',t:'🍽️ В ресторане',d:'A2'},
-    {id:'talk',t:'💬 Разговорные фразы',d:'B1'},
-    {id:'phone',t:'📞 Телефонный разговор',d:'B1'},
-    {id:'work',t:'💼 Деловой русский',d:'B1'},
-  ]},
+    {id:'self', t:'🗣️ Рассказ о себе',        d:'A1'},
+    {id:'shop', t:'🛒 Магазин и покупки',     d:'A2'},
+    {id:'trans',t:'🚌 Транспорт и дорога',    d:'A2'},
+    {id:'rest', t:'🍽️ В ресторане',           d:'A2'},
+    {id:'talk', t:'💬 Разговорные фразы',     d:'B1'},
+    {id:'phone',t:'📞 Телефонный разговор',   d:'B1'},
+    {id:'work', t:'💼 Деловой русский',       d:'B1'}
+  ]}
 ];
-const AT=MODS.flatMap(m=>m.t);
+var AT = [];
+MODS.forEach(function(m){m.t.forEach(function(t){AT.push(t);});});
 
-const BCARDS=[
-  {f:'Я',b:'1-е лицо: я — говорящий',c:'Я студент. Я говорю.'},
-  {f:'ты',b:'2-е лицо неформальное',c:'Ты говоришь по-русски?'},
-  {f:'он / она',b:'3-е лицо: он (м.р.) / она (ж.р.)',c:'Он идёт. Она читает.'},
-  {f:'мы',b:'1-е лицо мн.ч.',c:'Мы учимся каждый день.'},
-  {f:'вы',b:'2-е лицо формальное / мн.ч.',c:'Вы понимаете меня?'},
-  {f:'они',b:'3-е лицо мн.ч.',c:'Они живут в Москве.'},
-  {f:'говорить',b:'НСВ — to speak (процесс)',c:'Я говорю по-русски хорошо.'},
-  {f:'сказать',b:'СВ — to say (результат)',c:'Он сказал правду.'},
-  {f:'понимать',b:'НСВ — to understand',c:'Я не понимаю это слово.'},
-  {f:'читать',b:'НСВ — to read (процесс)',c:'Он читает книгу каждый вечер.'},
-  {f:'прочитать',b:'СВ — to read / finish reading',c:'Я прочитал книгу вчера.'},
-  {f:'писать',b:'НСВ — to write (процесс)',c:'Она пишет письмо другу.'},
-  {f:'написать',b:'СВ — to write / finish writing',c:'Я написал сообщение.'},
-  {f:'хотеть',b:'to want — хочу/хочешь/хочет',c:'Я хочу чай, пожалуйста.'},
-  {f:'мочь',b:'can / to be able — могу/можешь',c:'Я могу помочь вам.'},
-  {f:'идти',b:'идти (пешком, однократно)',c:'Я иду домой сейчас.'},
-  {f:'ходить',b:'ходить (пешком, многократно)',c:'Я хожу в школу каждый день.'},
-  {f:'жить',b:'to live — живу/живёшь/живёт',c:'Где ты живёшь?'},
-  {f:'любить',b:'to love / to like',c:'Я люблю русский язык!'},
-  {f:'знать',b:'to know — знаю/знаешь/знает',c:'Ты знаешь это слово?'},
-  {f:'Именительный',b:'Кто? Что? — подлежащее',c:'Книга лежит на столе.'},
-  {f:'Родительный',b:'Кого? Чего? — нет, из, без, от',c:'У меня нет книги.'},
-  {f:'Дательный',b:'Кому? Чему? — дать, идти к',c:'Я дал книгу другу.'},
-  {f:'Винительный',b:'Кого? Что? — вижу, читаю',c:'Я читаю книгу.'},
-  {f:'Творительный',b:'Кем? Чем? — с, между, под',c:'Я пишу ручкой.'},
-  {f:'Предложный',b:'О ком? О чём? — в, на, о',c:'Я думаю о книге.'},
-  {f:'НСВ',b:'Несовершенный вид — процесс / повторение',c:'Я читал книгу весь вечер.'},
-  {f:'СВ',b:'Совершенный вид — результат / завершение',c:'Я прочитал книгу вчера.'},
-  {f:'Здравствуйте',b:'Официальное приветствие',c:'Здравствуйте! Как вы?'},
-  {f:'Привет',b:'Неформальное приветствие',c:'Привет! Как дела?'},
-  {f:'До свидания',b:'Официальное прощание',c:'До свидания! Увидимся завтра.'},
-  {f:'Меня зовут...',b:'Формула представления',c:'Меня зовут Фаридун.'},
-  {f:'Я из...',b:'Откуда я — место происхождения',c:'Я из Душанбе.'},
-  {f:'Спасибо',b:'Благодарность',c:'Спасибо большое!'},
-  {f:'Пожалуйста',b:'Не за что / просьба',c:'Скажите, пожалуйста...'},
+var BCARDS = [
+  {f:'Я',          b:'1-е лицо ед.ч.',                    c:'Я студент. Я говорю по-русски.'},
+  {f:'ты',         b:'2-е лицо неформальное',             c:'Ты говоришь по-русски?'},
+  {f:'он / она',   b:'3-е лицо: он (м.р.) / она (ж.р.)', c:'Он идёт. Она читает книгу.'},
+  {f:'мы',         b:'1-е лицо мн.ч.',                   c:'Мы учимся каждый день.'},
+  {f:'вы',         b:'2-е лицо формальное / мн.ч.',      c:'Вы понимаете меня?'},
+  {f:'они',        b:'3-е лицо мн.ч.',                   c:'Они живут в Москве.'},
+  {f:'говорить',   b:'НСВ — to speak (процесс)',         c:'Я говорю по-русски хорошо.'},
+  {f:'сказать',    b:'СВ — to say (результат)',          c:'Он сказал мне правду.'},
+  {f:'понимать',   b:'НСВ — to understand',              c:'Я не понимаю это слово.'},
+  {f:'читать',     b:'НСВ — to read (процесс)',          c:'Он читает книгу каждый вечер.'},
+  {f:'прочитать',  b:'СВ — to read (завершить)',         c:'Я прочитал книгу вчера.'},
+  {f:'писать',     b:'НСВ — to write (процесс)',         c:'Она пишет письмо другу.'},
+  {f:'написать',   b:'СВ — to write (закончить)',        c:'Я написал сообщение другу.'},
+  {f:'хотеть',     b:'to want — хочу/хочешь/хочет',     c:'Я хочу чай, пожалуйста.'},
+  {f:'мочь',       b:'can — могу/можешь/может',          c:'Я могу помочь вам.'},
+  {f:'идти',       b:'идти пешком однократно',           c:'Я иду домой сейчас.'},
+  {f:'ходить',     b:'ходить пешком многократно',        c:'Я хожу в школу каждый день.'},
+  {f:'жить',       b:'to live — живу/живёшь/живёт',     c:'Где ты живёшь?'},
+  {f:'любить',     b:'to love / to like',                c:'Я люблю русский язык!'},
+  {f:'знать',      b:'to know — знаю/знаешь/знает',     c:'Ты знаешь это слово?'},
+  {f:'Именительный',b:'Кто? Что? — подлежащее',         c:'Книга лежит на столе.'},
+  {f:'Родительный', b:'Кого? Чего? — нет, из, без, от', c:'У меня нет книги.'},
+  {f:'Дательный',   b:'Кому? Чему? — дать, идти к',     c:'Я дал книгу другу.'},
+  {f:'Винительный', b:'Кого? Что? — вижу, читаю',       c:'Я читаю книгу каждый день.'},
+  {f:'Творительный',b:'Кем? Чем? — с, между, под',      c:'Я пишу ручкой в тетради.'},
+  {f:'Предложный',  b:'О ком? О чём? — в, на, о',       c:'Я думаю о книге весь день.'},
+  {f:'НСВ',        b:'Несовершенный вид — процесс',     c:'Я читал книгу весь вечер.'},
+  {f:'СВ',         b:'Совершенный вид — результат',     c:'Я прочитал книгу вчера.'},
+  {f:'Здравствуйте',b:'Официальное приветствие',        c:'Здравствуйте! Как вы?'},
+  {f:'Привет',      b:'Неформальное приветствие',       c:'Привет! Как дела?'},
+  {f:'До свидания', b:'Официальное прощание',           c:'До свидания! Увидимся завтра.'},
+  {f:'Меня зовут…', b:'Формула представления',         c:'Меня зовут Фаридун.'},
+  {f:'Я из…',       b:'Место происхождения',           c:'Я из Душанбе.'},
+  {f:'Спасибо',     b:'Благодарность',                 c:'Спасибо большое!'},
+  {f:'Пожалуйста',  b:'Не за что / просьба',           c:'Скажите, пожалуйста…'}
 ];
 
-window.onload=()=>{
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+var deferredInstall = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault(); deferredInstall = e;
+  document.getElementById('pwa-banner').style.display = 'flex';
+});
+
+window.onload = function(){
   load();
-  const k=localStorage.getItem('rmk')||'';
-  if(k&&k.length>10){S.key=k;}
-  else{document.getElementById('mapi').style.display='flex';}
-  renderAll();renderCurr();
-  document.getElementById('cinp')?.addEventListener('keypress',e=>{if(e.key==='Enter')sendChat();});
-  document.getElementById('ftopic')?.addEventListener('keypress',e=>{if(e.key==='Enter')loadFree();});
+  applyTheme();
+  applyFontSize();
+  renderAll(); renderCurr();
+  // inputs
+  document.getElementById('cinp').addEventListener('keypress',function(e){if(e.key==='Enter')sendChat();});
+  document.getElementById('ftopic').addEventListener('keypress',function(e){if(e.key==='Enter')loadFree();});
+  document.getElementById('dict-inp').addEventListener('keypress',function(e){if(e.key==='Enter')checkDictation();});
+  // init dictation
+  nextDictItem();
+  // PWA SW
+  regSW();
 };
 
 function load(){
-  try{const r=localStorage.getItem('rmv5');if(r)Object.assign(S,JSON.parse(r));}catch(e){}
-  const today=new Date().toISOString().slice(0,10);
+  try{var r=localStorage.getItem('rmv7');if(r)Object.assign(S,JSON.parse(r));}catch(e){}
+  var today=new Date().toISOString().slice(0,10);
   if(!S.lastDate)S.lastDate=today;
   if(today!==S.lastDate){
-    const d=Math.floor((new Date(today)-new Date(S.lastDate))/86400000);
+    var d=Math.floor((new Date(today)-new Date(S.lastDate))/86400000);
     S.streak=d===1?S.streak+1:(d>1?0:S.streak);
     S.lastDate=today;
   }
   if(!S.cards||S.cards.length===0){
-    S.cards=BCARDS.map(c=>({...c,interval:1,ease:2.5,next:0,reps:0}));
+    S.cards=BCARDS.map(function(c){return{f:c.f,b:c.b,c:c.c,interval:1,ease:2.5,next:0,reps:0};});
   }
   if(S.quizDate!==new Date().toISOString().slice(0,10)){S.quizDone=false;S.quizDate=new Date().toISOString().slice(0,10);}
+  if(S.apiDate!==new Date().toISOString().slice(0,10)){S.apiCount=0;S.apiDate=new Date().toISOString().slice(0,10);}
   save();
 }
 function save(){
-  const ks=Object.keys(S.cache);
-  if(ks.length>20)ks.slice(0,ks.length-20).forEach(k=>delete S.cache[k]);
-  try{localStorage.setItem('rmv5',JSON.stringify(S));}catch(e){}
+  var ks=Object.keys(S.cache);
+  if(ks.length>20)ks.slice(0,ks.length-20).forEach(function(k){delete S.cache[k];});
+  try{localStorage.setItem('rmv7',JSON.stringify(S));}catch(e){}
 }
 
-// NAV
-function goScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id)?.classList.add('active');
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function nav(screen,navId){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el=document.getElementById(screen);if(el)el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  var ni=document.getElementById(navId);if(ni)ni.classList.add('active');
   window.scrollTo(0,0);
 }
-function setNav(id){
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
-  document.getElementById(id)?.classList.add('active');
+function goBack(){nav('s-learn','n-learn');renderCurr();}
+function openM(id){document.getElementById(id).style.display='flex';}
+function closeM(id){document.getElementById(id).style.display='none';}
+function clearText(){document.getElementById('tinp').value='';document.getElementById('tres').style.display='none';}
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
 }
-function gotoHome(){goScreen('s-home');setNav('n-home');}
-function gotoLearn(){goScreen('s-learn');setNav('n-learn');renderCurr();}
-function gotoQuiz(){goScreen('s-quiz');setNav('n-quiz');loadQuiz();}
-function gotoText(){goScreen('s-text');setNav('n-text');}
-function gotoChat(){goScreen('s-chat');setNav('n-chat');}
-function gotoProg(){goScreen('s-prog');setNav('n-prog');}
-function goBack(){gotoLearn();}
-function openModal(id){document.getElementById(id).style.display='flex';}
-function closeModal(id){document.getElementById(id).style.display='none';}
-
-// API
-async function ai(sys,usr,tok){
-  if(S.offline||!S.key)return null;
-  const k=S.key.trim();
-  try{
-    if(k.startsWith('gsk_')){
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},
-        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:tok||1500,temperature:0.1})
-      });
-      if(!r.ok)return null;
-      const d=await r.json();
-      return d.choices?.[0]?.message?.content||null;
-    }
-    if(k.startsWith('sk-')&&!k.startsWith('sk-ant-')){
-      const r=await fetch('https://api.openai.com/v1/chat/completions',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},
-        body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:tok||1500,temperature:0.1})
-      });
-      if(!r.ok)return null;
-      const d=await r.json();
-      return d.choices?.[0]?.message?.content||null;
-    }
-  }catch(e){return null;}
-  return null;
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
 }
 
-function parseJSON(raw,arr){
+// ═══════════════════════════════════════════════════════
+// THEME & FONT
+// ═══════════════════════════════════════════════════════
+function applyTheme(){
+  var dark=S.theme!=='light';
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  var track=document.getElementById('theme-track');
+  var icon=document.getElementById('theme-icon');
+  var lbl=document.getElementById('theme-lbl');
+  if(track)track.className='toggle-track'+(dark?' on':'');
+  if(icon)icon.textContent=dark?'🌙':'☀️';
+  if(lbl)lbl.textContent=dark?'Тёмная тема':'Светлая тема';
+  var mc=document.querySelector('meta[name="theme-color"]');
+  if(mc)mc.content=dark?'#060B14':'#F0F4FF';
+}
+function toggleTheme(){
+  S.theme=S.theme==='dark'?'light':'dark';
+  save();applyTheme();
+  toast(S.theme==='dark'?'🌙 Тёмная тема':'☀️ Светлая тема','ok');
+}
+function applyFontSize(){
+  document.body.style.fontSize=S.fontSize+'%';
+  var d=document.getElementById('font-size-display');
+  if(d)d.textContent='Размер шрифта: '+S.fontSize+'%';
+}
+function changeFontSize(dir){
+  S.fontSize=Math.min(130,Math.max(80,S.fontSize+dir*10));
+  save();applyFontSize();
+}
+
+// ═══════════════════════════════════════════════════════
+// PWA
+// ═══════════════════════════════════════════════════════
+function installPWA(){
+  if(!deferredInstall)return;
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(function(){deferredInstall=null;hidePWA();});
+}
+function hidePWA(){document.getElementById('pwa-banner').style.display='none';}
+function regSW(){
+  if(!('serviceWorker' in navigator))return;
+  var sw="const C='rm-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const c=res.clone();caches.open(C).then(ca=>ca.put(e.request,c));return res;}).catch(()=>caches.match('/')))));";
+  try{navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})));}catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════════
+function exportData(){
+  var data={version:'rmv7',date:new Date().toISOString(),state:S};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='rusmaster-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  toast('✅ Данные экспортированы','ok');
+}
+function importData(){document.getElementById('import-file').click();}
+function handleImport(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(data.state){
+        Object.assign(S,data.state);
+        save();renderAll();renderCurr();
+        toast('✅ Данные импортированы!','ok');
+      }else{toast('❌ Неверный формат файла','err');}
+    }catch(err){toast('❌ Ошибка при импорте','err');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+// ═══════════════════════════════════════════════════════
+// API — with counter + limit
+// ═══════════════════════════════════════════════════════
+var API_DAILY_LIMIT = 100;
+
+function countAPI(){
+  S.apiCount++;
+  var today=new Date().toISOString().slice(0,10);
+  if(!S.xpLog)S.xpLog={};
+  S.xpLog[today]=(S.xpLog[today]||0)+1;
+  save();
+  updateAPIStatus();
+  if(S.apiCount>=API_DAILY_LIMIT*0.8){
+    var warn=document.getElementById('api-warn');
+    if(warn)warn.style.display='block';
+  }
+}
+
+function updateAPIStatus(){
+  var pct=Math.min(100,Math.round((S.apiCount/API_DAILY_LIMIT)*100));
+  var fill=document.getElementById('api-limit-fill');
+  var txt=document.getElementById('api-count-txt');
+  if(fill){
+    fill.style.width=pct+'%';
+    fill.style.background=pct>80?'linear-gradient(90deg,var(--err),#CC0000)':pct>50?'linear-gradient(90deg,var(--warn),var(--gold))':'linear-gradient(90deg,var(--ok),#00B356)';
+  }
+  if(txt)txt.textContent=S.apiCount+' / '+API_DAILY_LIMIT;
+}
+
+function aiCall(sys,usr,tok,cb){
+  if(S.offline||!S.key){cb(null);return;}
+  if(S.apiCount>=API_DAILY_LIMIT){
+    toast('⚠️ Лимит запросов на сегодня. Используем кэш.','err');
+    cb(null);return;
+  }
+  var k=S.key.trim();
+  var url,body;
+  if(k.startsWith('gsk_')){
+    url='https://api.groq.com/openai/v1/chat/completions';
+    body=JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:tok||1500,temperature:0.1});
+  }else if(k.startsWith('sk-')&&!k.startsWith('sk-ant-')){
+    url='https://api.openai.com/v1/chat/completions';
+    body=JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:tok||1500,temperature:0.1});
+  }else{cb(null);return;}
+  countAPI();
+  fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:body})
+  .then(function(r){return r.json();})
+  .then(function(d){cb((d.choices&&d.choices[0]&&d.choices[0].message)?d.choices[0].message.content:null);})
+  .catch(function(){cb(null);});
+}
+
+function parseJ(raw,arr){
   if(!raw)return null;
   try{
-    let s=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
-    const o=arr?'[':'{',c=arr?']':'}';
-    const si=s.indexOf(o),ei=s.lastIndexOf(c);
+    var s=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+    var o=arr?'[':'{',c=arr?']':'}';
+    var si=s.indexOf(o),ei=s.lastIndexOf(c);
     if(si!==-1&&ei!==-1)s=s.slice(si,ei+1);
     return JSON.parse(s);
   }catch(e){return null;}
 }
 
-window.doValidateKey=async()=>{
-  const key=document.getElementById('apiinp').value.trim();
+// KEY
+function doKey(){
+  var key=document.getElementById('apiinp').value.trim();
   if(!key||key.length<10){showErr('Введите корректный ключ');return;}
-  const btn=document.querySelector('#mapi .bp');
-  btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
-  let ok=false;
-  try{
-    if(key.startsWith('gsk_')){
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:'hi'}],max_tokens:1})
-      });
-      ok=r.status===200;
-    }else if(key.startsWith('sk-')&&!key.startsWith('sk-ant-')){
-      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
-      ok=r.status===200;
-    }else if(key.startsWith('sk-ant-')){
-      btn.innerHTML='&#10003; Подключить';btn.disabled=false;
-      showErr('Ключ Anthropic (sk-ant-...) не работает из браузера из-за CORS. Используйте бесплатный Groq: console.groq.com → ключ gsk_...');
-      return;
+  if(key.startsWith('sk-ant-')){showErr('Ключ Anthropic не работает из браузера (CORS). Используйте Groq: console.groq.com');return;}
+  var btn=document.querySelector('#mapi .bp');btn.innerHTML='<span class="spin"></span>';btn.disabled=true;
+  var url=key.startsWith('gsk_')?'https://api.groq.com/openai/v1/chat/completions':'https://api.openai.com/v1/chat/completions';
+  fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
+    body:JSON.stringify({model:key.startsWith('gsk_')?'llama-3.1-8b-instant':'gpt-4o-mini',messages:[{role:'user',content:'ping'}],max_tokens:1})})
+  .then(function(r){
+    btn.innerHTML='✓ Подключить';btn.disabled=false;
+    if(r.status===200){
+      S.key=key;localStorage.setItem('rmk',key);S.offline=false;
+      closeM('mapi');setAIStatus(true);toast('✅ AI подключён!','ok');renderAll();
+    }else{showErr('❌ Ключ не работает. Проверьте ключ Groq (gsk_...) или OpenAI (sk-..)');}
+  })
+  .catch(function(){btn.innerHTML='✓ Подключить';btn.disabled=false;showErr('❌ Ошибка соединения.');});
+}
+function doOffline(){S.offline=true;closeM('mapi');setAIStatus(false);toast('Офлайн режим','ok');renderAll();}
+function showErr(m){var e=document.getElementById('apierr');e.textContent=m;e.style.display='block';}
+
+function setAIStatus(ok){
+  var dot=document.getElementById('ai-dot');
+  var txt=document.getElementById('ai-status-txt');
+  var badge=document.getElementById('drawer-ai-badge');
+  if(dot)dot.className='ai-dot'+(ok?' connected':'');
+  if(txt)txt.textContent=ok?'AI':'Офлайн';
+  if(badge)badge.textContent=ok?'Активен':'Офлайн';
+  if(badge)badge.style.background=ok?'var(--ok)':'var(--mut)';
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function tname(id){for(var i=0;i<AT.length;i++){if(AT[i].id===id)return AT[i].t;}return id;}
+function addCards(cs){
+  cs.forEach(function(c){
+    var ex=false;for(var i=0;i<S.cards.length;i++){if(S.cards[i].f===c.f){ex=true;break;}}
+    if(!ex)S.cards.push({f:c.f,b:c.b||'',c:c.c||'',interval:1,ease:2.5,next:0,reps:0});
+  });save();
+}
+
+// BOOKMARKS
+function toggleBookmark(){
+  var id=S.topic;if(!id)return;
+  var idx=S.bookmarks.indexOf(id);
+  if(idx===-1){S.bookmarks.push(id);toast('🔖 Добавлено в закладки','ok');}
+  else{S.bookmarks.splice(idx,1);toast('Закладка удалена','ok');}
+  save();updateBookmarkBtn();
+}
+function updateBookmarkBtn(){
+  var btn=document.getElementById('bmark-btn');
+  if(!btn)return;
+  var saved=S.bookmarks.indexOf(S.topic)!==-1;
+  btn.textContent=saved?'🔖':'♡';
+  btn.className='bookmark-btn'+(saved?' saved':'');
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════
+function searchCurr(q){
+  if(!q){renderCurr();return;}
+  q=q.toLowerCase();
+  var html='<div class="mod-g">';
+  var found=false;
+  AT.forEach(function(t){
+    if(t.t.toLowerCase().indexOf(q)!==-1||t.id.indexOf(q)!==-1){
+      found=true;
+      var done=S.done.indexOf(t.id)!==-1;
+      var weak=!done&&S.weak.indexOf(t.id)!==-1;
+      html+='<button class="tb'+(done?' done':'')+(weak?' weak':'')+'" onclick="loadLesson(\''+t.id+'\')">'
+          +'<span>'+t.t+(done?' ✅':'')+'</span>'
+          +'<span class="db d'+t.d.toLowerCase()+'">'+t.d+'</span></button>';
     }
-  }catch(e){}
-  btn.innerHTML='&#10003; Подключить';btn.disabled=false;
-  if(ok){
-    S.key=key;localStorage.setItem('rmk',key);S.offline=false;
-    closeModal('mapi');toast('✅ AI подключён!','ok');renderAll();
-  }else{
-    showErr('❌ Ключ не работает. Проверьте ключ Groq (gsk_...) или OpenAI (sk-...)');
-  }
-};
-window.doOffline=()=>{S.offline=true;closeModal('mapi');toast('🌐 Офлайн режим','ok');renderAll();};
-function showErr(m){const e=document.getElementById('apierr');e.textContent=m;e.style.display='block';}
-
-// TOPIC NAME
-function tname(id){return AT.find(t=>t.id===id)?.t||id;}
-
-// GENERATE LESSON
-async function genLesson(id){
-  const topic=tname(id);
-  const sys='Ты профессор русского языка. Отвечай ТОЛЬКО валидным JSON без markdown и без текста вне JSON.';
-  const usr='Создай подробный урок по теме: "'+topic+'". Уровень студента: '+S.level+'.\n'+
-    'Верни строго этот JSON:\n'+
-    '{"title":"название урока","explanation":"подробное объяснение 3-4 абзаца с правилами и исключениями","grammar_focus":["правило 1","правило 2","правило 3"],"examples":[{"ru":"предложение на русском","note":"грамматическое пояснение"},{"ru":"второй пример","note":"пояснение"},{"ru":"третий пример","note":"пояснение"}],"common_mistakes":[{"wrong":"неверный вариант","correct":"верный вариант","reason":"почему это ошибка"},{"wrong":"ошибка 2","correct":"верно 2","reason":"причина"}],"practice":{"items":[{"q":"задание или вопрос","a":"правильный ответ","hint":"подсказка"},{"q":"задание 2","a":"ответ 2","hint":"подсказка"},{"q":"задание 3","a":"ответ 3","hint":"подсказка"},{"q":"задание 4","a":"ответ 4","hint":"подсказка"}]},"flashcards":[{"f":"слово/фраза","b":"объяснение или пример","c":"пример в предложении"},{"f":"слово 2","b":"объяснение","c":"пример"}],"cultural_note":"культурный контекст или интересный факт о русском языке","related":["смежная тема 1","смежная тема 2","смежная тема 3"]}';
-  if(S.offline||!S.key)return fallback(id);
-  const raw=await ai(sys,usr,2000);
-  const lesson=parseJSON(raw,false);
-  if(lesson){if(lesson.flashcards?.length)addCards(lesson.flashcards);return lesson;}
-  return fallback(id);
+  });
+  if(!found)html+='<p style="color:var(--mut);font-size:12px">Ничего не найдено</p>';
+  html+='</div>';
+  document.getElementById('clist').innerHTML=html;
 }
 
-function fallback(id){
-  const F={
-    alphabet:{title:'🔤 Алфавит и произношение',
-      explanation:'Русский алфавит — кириллица — содержит 33 буквы.\n\n✅ 10 гласных: А, Е, Ё, И, О, У, Ы, Э, Ю, Я\n✅ 21 согласная\n✅ 2 знака: ъ (твёрдый) и ь (мягкий) — они не имеют звука\n\nКлюч к произношению: ударный слог произносится чётко, безударные — редуцируются (сокращаются). Например: молоко = [малАко], хорошо = [харашО].\n\nБуквы похожие на латинские: А=A, О=O, М=M, Т=T, К=K. Буквы-ловушки: В=[v], Н=[n], Р=[r], С=[s], Х=[h].',
-      grammar_focus:['33 буквы в алфавите','10 гласных, 21 согласная','Редукция безударных гласных'],
-      examples:[{ru:'Молоко',note:'Ударение на последний слог: мо-ло-КО → [малАко]'},{ru:'Хорошо',note:'Безударные О → А: хо-ро-ШО → [харашО]'},{ru:'Привет',note:'При-ВЕТ — ударение на второй слог'}],
-      common_mistakes:[{wrong:'Читать О как в слове «cold»',correct:'Безударное О произносится как А',reason:'В русском языке происходит редукция гласных в безударных слогах'},{wrong:'Считать Ь знаком-буквой со звуком',correct:'Ь — мягкий знак, не имеет звука, делает предыдущую согласную мягкой',reason:'Ь и Ъ — это знаки, а не буквы со звуком'}],
-      practice:{items:[{q:'Сколько букв в русском алфавите?',a:'33',hint:'Гласных 10, согласных 21, знаков 2'},{q:'Как произносится слово МОЛОКО?',a:'малако',hint:'Безударные О → А'},{q:'Имеют ли Ь и Ъ звук?',a:'Нет, они не имеют звука',hint:'Это знаки, а не звуки'},{q:'Назовите 5 гласных букв',a:'А, Е, И, О, У',hint:'Всего 10 гласных'}]},
-      flashcards:[{f:'А',b:'Гласная [а]',c:'Аня, апельсин, август'},{f:'Я',b:'Гласная [йа]',c:'Яблоко, яркий, январь'},{f:'Ы',b:'Гласная [ы] — нет аналога',c:'Мы, рыба, сыр'}],
-      cultural_note:'Кириллический алфавит создан Кириллом и Мефодием в IX веке на основе греческого. Сегодня используется в России, Болгарии, Сербии и других странах.',
-      related:['Настоящее время','Приветствия и прощания','Род существительных']},
-    greet:{title:'👋 Приветствия и прощания',
-      explanation:'В русском языке два уровня общения: официальный (Вы) и неформальный (ты).\n\nОФИЦИАЛЬНЫЙ стиль — с незнакомыми, старшими, в рабочей обстановке:\n— Здравствуйте! (Привет официально)\n— Как вы себя чувствуете? / Как у вас дела?\n— До свидания!\n\nНЕФОРМАЛЬНЫЙ стиль — с друзьями, ровесниками:\n— Привет! / Здорово!\n— Как дела? / Как ты?\n— Пока! / Пока-пока!\n\nВАЖНО: Меня зовут... — правильная формула представления. НЕ говорите "Я есть Фаридун" — это ошибка!',
-      grammar_focus:['Официальный Вы vs неформальный ты','Меня зовут + имя (представление)','Я из + город (происхождение)'],
-      examples:[{ru:'Здравствуйте, меня зовут Фаридун.',note:'Официальное приветствие + представление'},{ru:'Я из Душанбе. Я живу в России.',note:'Я из + город — правильно. Я с Душанбе — ОШИБКА'},{ru:'Привет! Как дела? — Хорошо, спасибо!',note:'Неформальный разговор между друзьями'}],
-      common_mistakes:[{wrong:'Я есть Фаридун.',correct:'Меня зовут Фаридун.',reason:'Глагол "есть" не используется для представления в русском языке'},{wrong:'Я с Душанбе.',correct:'Я из Душанбе.',reason:'Предлог ИЗ + родительный падеж = откуда я'},{wrong:'Привет, Иван Иванович!',correct:'Здравствуйте, Иван Иванович!',reason:'С официальными лицами и старшими — только официальное приветствие'}],
-      practice:{items:[{q:'Как официально приветствуют по-русски?',a:'Здравствуйте',hint:'Используется с незнакомыми и старшими'},{q:'Скажите: "Меня зовут [ваше имя]"',a:'Меня зовут [ваше имя]',hint:'Меня зовут + ваше имя'},{q:'Как по-русски "Я из Душанбе"?',a:'Я из Душанбе',hint:'Я из + название города'},{q:'Как неформально прощаются?',a:'Пока',hint:'Между друзьями'}]},
-      flashcards:[{f:'Здравствуйте',b:'Официальное приветствие',c:'Здравствуйте! Рад вас видеть.'},{f:'Привет',b:'Неформальное приветствие',c:'Привет! Как дела?'},{f:'Меня зовут...',b:'Формула представления',c:'Меня зовут Фаридун.'},{f:'Я из...',b:'Место происхождения',c:'Я из Душанбе.'}],
-      cultural_note:'В России при знакомстве принято смотреть в глаза и уверенно жать руку. Избегайте рукопожатия через порог — это считается дурным знаком.',
-      related:['Рассказ о себе','Числительные','Настоящее время']},
-    c_nom:{title:'🗝️ Именительный падеж',
-      explanation:'Именительный падеж (И.п.) — исходная форма слова, как в словаре.\nВопросы: КТО? (для одушевлённых) ЧТО? (для неодушевлённых)\nФункция: подлежащее предложения.\n\nОКОНЧАНИЯ:\nМужской род: нулевое (стол, дом), -й (чай, музей), -ь (день, конь)\nЖенский род: -а (книга, мама), -я (неделя, дядя), -ь (ночь, мышь)\nСредний род: -о (слово, окно), -е (море, поле)\n\nМножественное число: -ы/-и (столы, книги), -а/-я (города, моря)',
-      grammar_focus:['Вопросы: Кто? Что?','Функция подлежащего в предложении','Окончания по роду и числу'],
-      examples:[{ru:'Книга лежит на столе.',note:'книга — Ж.р., И.п., подлежащее (кто? что? — книга)'},{ru:'Студент учится в университете.',note:'студент — М.р., нулевое окончание'},{ru:'Море голубое и красивое.',note:'море — Ср.р., окончание -е'}],
-      common_mistakes:[{wrong:'Я вижу книга.',correct:'Я вижу книгу. (Вин.п.)',reason:'После глагола "видеть" нужен Винительный падеж, не Именительный'},{wrong:'Книга — мужской род',correct:'Книга — женский род (окончание -а)',reason:'Слова на -а/-я обычно женского рода'}],
-      practice:{items:[{q:'Какое окончание у слова СТОЛ в И.п.?',a:'нулевое',hint:'Мужской род, основа заканчивается на согласную'},{q:'Определите падеж: "КОШКА спит на диване."',a:'Именительный падеж',hint:'Вопрос: кто? — кошка'},{q:'КНИГА — какой род?',a:'Женский род',hint:'Окончание -а → женский род'},{q:'Как изменится ГОРОД во мн.ч. (И.п.)?',a:'Города',hint:'М.р. на -а/-я во мн.ч.'}]},
-      flashcards:[{f:'Кто? Что?',b:'Вопросы Именительного падежа',c:'Кто? — Студент. Что? — Книга.'},{f:'подлежащее',b:'Главный член предложения — И.п.',c:'КНИГА лежит. СТУДЕНТ учится.'}],
-      cultural_note:'В русском языке 6 падежей. Именительный — единственный, в котором существительное стоит без предлога как подлежащее.',
-      related:['Родительный падеж','Род существительных','Винительный падеж']},
-    v_asp:{title:'🔄 Вид глагола: НСВ / СВ',
-      explanation:'Вид глагола — важнейшая категория русского языка, которой нет в большинстве других языков.\n\nНЕСОВЕРШЕННЫЙ ВИД (НСВ) — что ДЕЛАТЬ?\n• Процесс, длительность\n• Повторяющееся действие\n• Общее утверждение\nПримеры: читать, писать, говорить, делать\n\nСОВЕРШЕННЫЙ ВИД (СВ) — что СДЕЛАТЬ?\n• Результат, завершённость\n• Однократное действие\n• Конкретный момент\nПримеры: прочитать, написать, сказать, сделать\n\nВИДОВЫЕ ПАРЫ: читать→прочитать, писать→написать, делать→сделать, говорить→сказать, видеть→увидеть',
-      grammar_focus:['НСВ = процесс / повторение / длительность','СВ = результат / завершение / однократность','Видовые пары глаголов'],
-      examples:[{ru:'Я читал книгу весь вечер. (НСВ)',note:'Процесс важен, результат не указан → НСВ'},{ru:'Я прочитал книгу вчера. (СВ)',note:'Книга прочитана, результат достигнут → СВ'},{ru:'Каждый день я читаю газету. (НСВ)',note:'Повторяющееся действие → всегда НСВ'}],
-      common_mistakes:[{wrong:'Я уже читал эту книгу.',correct:'Я уже прочитал эту книгу.',reason:'С "уже" нужен СВ — акцент на завершённости действия'},{wrong:'Завтра я буду прочитать книгу.',correct:'Завтра я прочитаю книгу.',reason:'Будущее время СВ образуется без "буду" — одним словом'}],
-      practice:{items:[{q:'НСВ или СВ: "Вчера весь день я ___ (читать/прочитать) книгу."',a:'читал (НСВ)',hint:'Весь день = длительность → НСВ'},{q:'НСВ или СВ: "Наконец я ___ (читать/прочитать) эту книгу!"',a:'прочитал (СВ)',hint:'Наконец = результат достигнут → СВ'},{q:'Видовая пара глагола ПИСАТЬ?',a:'написать',hint:'Приставка на- + писать'},{q:'Видовая пара глагола ДЕЛАТЬ?',a:'сделать',hint:'Приставка с- + делать'}]},
-      flashcards:[{f:'читать (НСВ)',b:'Процесс чтения',c:'Я читаю каждый день.'},{f:'прочитать (СВ)',b:'Завершить чтение',c:'Я прочитал роман за неделю.'}],
-      cultural_note:'Вид глагола — одна из самых сложных тем для иностранцев. Совет: учите глаголы сразу парами (НСВ + СВ).',
-      related:['Прошедшее время','Будущее время','Глаголы движения']},
-  };
-  return F[id]||{
-    title:tname(id),
-    explanation:'Для полного урока подключите ключ Groq (gsk_...) на сайте console.groq.com — это бесплатно.\n\nВ офлайн-режиме доступны только основные темы.',
-    grammar_focus:['Уроки генерируются AI','Подключите ключ на console.groq.com'],
-    examples:[{ru:'Пример будет загружен при подключении AI',note:'Подключите ключ для полного урока'}],
-    common_mistakes:[{wrong:'Офлайн режим',correct:'Подключите AI',reason:'Для динамических уроков нужен ключ Groq'}],
-    practice:{items:[{q:'Перейдите на console.groq.com и получите бесплатный ключ',a:'ok',hint:'gsk_...'}]},
-    flashcards:[],
-    cultural_note:'Русский язык — один из богатейших языков мира. Удачи в изучении!',
-    related:[]
-  };
-}
-
+// ═══════════════════════════════════════════════════════
 // CURRICULUM
+// ═══════════════════════════════════════════════════════
 function renderCurr(){
-  document.getElementById('clist').innerHTML=MODS.map(m=>
-    '<div class="mg"><div class="mh">'+m.n+'</div>'+
-    m.t.map(t=>{
-      const done=S.completed.includes(t.id);
-      const weak=S.weak.includes(t.id)&&!done;
-      return '<button class="tb'+(done?' done':'')+(weak?' weak':'')+'" onclick="loadLesson(\''+t.id+'\')">'
-        +'<span>'+t.t+(done?' ✅':'')+'</span>'
-        +'<div style="display:flex;gap:5px;align-items:center">'
-        +'<span class="db d'+t.d.toLowerCase()+'">'+t.d+'</span>'
-        +(weak?'<span style="color:var(--error);font-size:9px">повторить</span>':'')
-        +'</div></button>';
-    }).join('')
-    +'</div>'
-  ).join('');
+  // Module progress bars
+  var mpEl=document.getElementById('module-progress');
+  if(mpEl){
+    var mpHtml='';
+    MODS.forEach(function(m){
+      var total=m.t.length;
+      var comp=m.t.filter(function(t){return S.done.indexOf(t.id)!==-1;}).length;
+      var pct=Math.round((comp/total)*100);
+      mpHtml+='<div class="prog-bar-wrap"><div class="prog-bar-label"><span style="font-size:11px;font-family:var(--fh)">'+m.n+'</span><span>'+comp+'/'+total+'</span></div>'
+            +'<div class="prog-bar-track"><div class="prog-bar-fill acc" style="width:'+pct+'%"></div></div></div>';
+    });
+    mpEl.innerHTML=mpHtml;
+  }
+  // Topic list
+  var html='';
+  MODS.forEach(function(m){
+    html+='<div class="mod-g"><div class="mod-h">'+m.n+'</div>';
+    m.t.forEach(function(t){
+      var done=S.done.indexOf(t.id)!==-1;
+      var weak=!done&&S.weak.indexOf(t.id)!==-1;
+      html+='<button class="tb'+(done?' done':'')+(weak?' weak':'')+'" onclick="loadLesson(\''+t.id+'\')">'
+          +'<span>'+t.t+(done?' ✅':'')+'</span>'
+          +'<div style="display:flex;gap:5px;align-items:center">'
+          +'<span class="db d'+t.d.toLowerCase()+'">'+t.d+'</span>'
+          +(weak?'<span style="color:var(--err);font-size:9px">повторить</span>':'')
+          +'</div></button>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('clist').innerHTML=html;
 }
 
-// LOAD LESSON
-async function loadLesson(id){
-  S.topic=id;
-  S.topicIdx=AT.findIndex(t=>t.id===id);
-  goScreen('s-lesson');setNav('n-learn');
-  document.getElementById('lpos').textContent=(S.topicIdx+1)+'/'+AT.length;
+// ═══════════════════════════════════════════════════════
+// LESSON GENERATION
+// ═══════════════════════════════════════════════════════
+function genLesson(id,cb){
+  var topic=tname(id);
+  var sys='Ты профессор русского языка. Отвечай ТОЛЬКО валидным JSON без markdown.';
+  var usr='Создай подробный урок по теме: "'+topic+'". Уровень: '+S.level+'.\n'
+    +'JSON: {"title":"...","explanation":"3-4 абзаца с правилами и исключениями","grammar_focus":["правило1","правило2","правило3"],'
+    +'"examples":[{"ru":"пример","note":"пояснение"},{"ru":"пример2","note":"пояснение2"},{"ru":"пример3","note":"пояснение3"}],'
+    +'"common_mistakes":[{"wrong":"неверно","correct":"верно","reason":"причина"},{"wrong":"...","correct":"...","reason":"..."}],'
+    +'"practice":[{"q":"задание","a":"ответ","hint":"подсказка"},{"q":"...","a":"...","hint":"..."},{"q":"...","a":"...","hint":"..."},{"q":"...","a":"...","hint":"..."}],'
+    +'"flashcards":[{"f":"слово","b":"объяснение","c":"пример"},{"f":"...","b":"...","c":"..."}],'
+    +'"cultural_note":"интересный факт","related":["тема1","тема2","тема3"]}';
+  if(S.offline||!S.key){cb(fallback(id));return;}
+  aiCall(sys,usr,2000,function(raw){
+    var lesson=parseJ(raw,false);
+    if(lesson){if(lesson.flashcards)addCards(lesson.flashcards);cb(lesson);}
+    else cb(fallback(id));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FALLBACK LESSONS
+// ═══════════════════════════════════════════════════════
+function fallback(id){
+  var F={
+    alphabet:{title:'🔤 Алфавит и произношение',
+      explanation:'Русский алфавит — кириллица — содержит 33 буквы.\n\n✅ 10 гласных: А, Е, Ё, И, О, У, Ы, Э, Ю, Я\n✅ 21 согласная\n✅ 2 знака: ъ (твёрдый) и ь (мягкий) — без звука\n\nКлюч: ударный слог чёткий, безударные сокращаются. Молоко → [малАко], хорошо → [харашО].\n\nБуквы-ловушки: В=[v], Н=[n], Р=[r], С=[s], Х=[kh], Ж=[zh].',
+      grammar_focus:['33 буквы: 10 гласных + 21 согл + 2 знака','Ъ и Ь — знаки без звука','Редукция: безударное О → А'],
+      examples:[{ru:'молоко',note:'Ударение: мо-ло-КО → [малАко]'},{ru:'хорошо',note:'Хо-ро-ШО → [харашО]'},{ru:'привет',note:'При-ВЕТ — ударение на 2-й слог'}],
+      common_mistakes:[{wrong:'Читать О всегда как "о"',correct:'Безударное О → А',reason:'Редукция гласных в безударных слогах'},{wrong:'Считать Ь буквой со звуком',correct:'Ь — знак без звука',reason:'Ь и Ъ — знаки, не буквы'}],
+      practice:[{q:'Сколько букв в русском алфавите?',a:'33',hint:'10+21+2'},{q:'Как произносится МОЛОКО?',a:'малако',hint:'О без ударения → А'},{q:'Имеют ли Ь и Ъ звук?',a:'Нет',hint:'Это знаки'},{q:'Назовите 3 гласных',a:'А, О, И',hint:'Всего 10 гласных'}],
+      flashcards:[{f:'А',b:'Гласная [а]',c:'Аня, апельсин'},{f:'Я',b:'Гласная [йа]',c:'Яблоко, январь'},{f:'Ы',b:'Гласная [ы]',c:'Мы, рыба, сыр'}],
+      cultural_note:'Кириллица создана Кириллом и Мефодием в IX веке на основе греческого.',related:['Настоящее время','Приветствия','Род существительных']},
+    greet:{title:'👋 Приветствия и прощания',
+      explanation:'В русском два уровня: официальный (Вы) и неформальный (ты).\n\nОФИЦИАЛЬНЫЙ — с незнакомыми, старшими, на работе:\n— Здравствуйте! До свидания!\n\nНЕФОРМАЛЬНЫЙ — с друзьями:\n— Привет! Пока!\n\n⚠️ ВАЖНО: "Меня зовут..." — правильно. "Я есть Иван" — ОШИБКА!\n⚠️ "Я из Душанбе" — правильно. "Я с Душанбе" — ОШИБКА!',
+      grammar_focus:['Официальный Вы vs неформальный ты','Меня зовут + имя','Я из + город'],
+      examples:[{ru:'Здравствуйте, меня зовут Фаридун.',note:'Официальное + представление'},{ru:'Я из Душанбе. Я живу в России.',note:'Я из + город — правильно'},{ru:'Привет! Как дела? — Хорошо, спасибо!',note:'Неформальный разговор'}],
+      common_mistakes:[{wrong:'Я есть Фаридун.',correct:'Меня зовут Фаридун.',reason:'Глагол "есть" не используется для представления'},{wrong:'Я с Душанбе.',correct:'Я из Душанбе.',reason:'ИЗ + родительный = откуда я'}],
+      practice:[{q:'Как официально приветствуют?',a:'Здравствуйте',hint:'Для незнакомых'},{q:'Ответьте: Как тебя зовут?',a:'Меня зовут [имя]',hint:'Меня зовут + имя'},{q:'Как сказать "я из Душанбе"?',a:'Я из Душанбе',hint:'Я из + город'},{q:'Как неформально прощаются?',a:'Пока',hint:'Для друзей'}],
+      flashcards:[{f:'Здравствуйте',b:'Официальное приветствие',c:'Здравствуйте! Рад вас видеть.'},{f:'Привет',b:'Неформальное приветствие',c:'Привет! Как дела?'},{f:'Меня зовут…',b:'Формула представления',c:'Меня зовут Фаридун.'},{f:'Я из…',b:'Место происхождения',c:'Я из Душанбе.'}],
+      cultural_note:'При знакомстве принято смотреть в глаза и жать руку.',related:['Рассказ о себе','Числительные','Настоящее время']},
+    c_nom:{title:'🗝️ Именительный падеж',
+      explanation:'И.п. — исходная форма, как в словаре.\nВопросы: КТО? ЧТО?\nФункция: подлежащее.\n\nОКОНЧАНИЯ:\nМ.р.: нулевое (стол), -й (чай), -ь (день)\nЖ.р.: -а (книга), -я (неделя), -ь (ночь)\nСр.р.: -о (слово), -е (море)\nМн.ч.: -ы/-и (столы, книги)',
+      grammar_focus:['Вопросы: Кто? Что?','Функция: подлежащее','Окончания по роду'],
+      examples:[{ru:'Книга лежит на столе.',note:'книга — Ж.р., И.п., подлежащее'},{ru:'Студент учится в университете.',note:'студент — М.р., нулевое окончание'},{ru:'Море голубое.',note:'море — Ср.р., окончание -е'}],
+      common_mistakes:[{wrong:'Я вижу книга.',correct:'Я вижу книгу. (Вин.п.)',reason:'После "видеть" — Винительный, не Именительный'},{wrong:'Книга — мужской род',correct:'Книга — женский род (окончание -а)',reason:'Слова на -а/-я обычно женского рода'}],
+      practice:[{q:'Окончание СТОЛ в И.п.?',a:'нулевое',hint:'М.р., заканчивается на согласную'},{q:'Падеж: "КОШКА спит."',a:'Именительный',hint:'Вопрос: кто?'},{q:'КНИГА — какой род?',a:'Женский',hint:'Окончание -а'},{q:'ГОРОД во мн.ч. (И.п.)?',a:'Города',hint:'М.р. → -а во мн.ч.'}],
+      flashcards:[{f:'Кто? Что?',b:'Вопросы Именительного',c:'Кто? — Студент. Что? — Книга.'},{f:'подлежащее',b:'Главный член — И.п.',c:'КНИГА лежит. СТУДЕНТ учится.'}],
+      cultural_note:'В русском 6 падежей. Именительный — единственный без предлога как подлежащее.',related:['Родительный падеж','Род существительных','Винительный падеж']},
+    v_asp:{title:'🔄 Вид глагола: НСВ / СВ',
+      explanation:'НСВ (что ДЕЛАТЬ?) — процесс, длительность, повторение.\nСВ (что СДЕЛАТЬ?) — результат, завершённость, однократность.\n\nВИДОВЫЕ ПАРЫ:\nчитать → прочитать\nписать → написать\nделать → сделать\nговорить → сказать',
+      grammar_focus:['НСВ = процесс / повторение','СВ = результат / завершение','Видовые пары'],
+      examples:[{ru:'Я читал книгу весь вечер. (НСВ)',note:'Процесс, длительность → НСВ'},{ru:'Я прочитал книгу вчера. (СВ)',note:'Результат достигнут → СВ'},{ru:'Каждый день я читаю газету. (НСВ)',note:'Повторение → НСВ'}],
+      common_mistakes:[{wrong:'Я уже читал эту книгу.',correct:'Я уже прочитал эту книгу.',reason:'С "уже" нужен СВ — акцент на завершённости'},{wrong:'Буду прочитать.',correct:'Прочитаю.',reason:'Будущее СВ — одним словом, без "буду"'}],
+      practice:[{q:'НСВ/СВ: "Весь день я ___ книгу." (читать/прочитать)',a:'читал (НСВ)',hint:'Весь день = длительность'},{q:'НСВ/СВ: "Наконец я ___ книгу!"',a:'прочитал (СВ)',hint:'Наконец = результат'},{q:'Пара к ПИСАТЬ?',a:'написать',hint:'Приставка на-'},{q:'Пара к ДЕЛАТЬ?',a:'сделать',hint:'Приставка с-'}],
+      flashcards:[{f:'читать (НСВ)',b:'Процесс чтения',c:'Я читаю каждый день.'},{f:'прочитать (СВ)',b:'Завершить чтение',c:'Я прочитал роман за неделю.'}],
+      cultural_note:'Вид глагола — уникальная черта русского. Учите глаголы сразу парами!',related:['Прошедшее время','Будущее время','Глаголы движения']}
+  };
+  return F[id]||{title:tname(id),explanation:'Подключите ключ Groq (gsk_...) на console.groq.com для полного урока.',grammar_focus:['Подключите Groq'],examples:[{ru:'Урок загрузится при подключении AI',note:'console.groq.com — бесплатно'}],common_mistakes:[{wrong:'Офлайн',correct:'Подключите AI',reason:'Нужен ключ Groq'}],practice:[{q:'Получите бесплатный ключ на console.groq.com',a:'ok',hint:''}],flashcards:[],cultural_note:'Русский — один из богатейших языков мира!',related:[]};
+}
+
+// ═══════════════════════════════════════════════════════
+// LOAD & RENDER LESSON
+// ═══════════════════════════════════════════════════════
+var LESSON_ANSWERS=[];
+var LESSON_RELATED=[];
+var LESSON_EXAMPLES=[];
+
+function loadLesson(id){
+  S.topic=id;S.topicI=0;
+  for(var i=0;i<AT.length;i++){if(AT[i].id===id){S.topicI=i;break;}}
+  nav('s-lesson','n-learn');
+  document.getElementById('lpos').textContent=(S.topicI+1)+' / '+AT.length;
+  var progPct=Math.round(((S.topicI+1)/AT.length)*100);
+  document.getElementById('les-prog-fill').style.width=progPct+'%';
   document.getElementById('ltitle').textContent=tname(id);
-  document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:40px"><span class="spin"></span><div style="margin-top:12px;color:var(--muted);font-size:12px">AI готовит урок...</div></div>';
-  const cached=S.cache[id];
-  const lesson=cached||await genLesson(id);
-  if(!cached){S.cache[id]=lesson;save();}
-  renderLesson(lesson);
-  if(!S.completed.includes(id)){
-    S.completed.push(id);
-    S.progress=Math.round((S.completed.length/AT.length)*100);
+  document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:40px"><span class="spin"></span><div style="margin-top:12px;color:var(--mut);font-size:12px">AI готовит урок...</div></div>';
+  updateBookmarkBtn();
+  var cached=S.cache[id];
+  if(cached){renderLesson(cached);}
+  else{genLesson(id,function(lesson){S.cache[id]=lesson;save();renderLesson(lesson);});}
+  if(S.done.indexOf(id)===-1){
+    S.done.push(id);
+    S.progress=Math.round((S.done.length/AT.length)*100);
     addXP(50,'🎯 +50 XP — Урок пройден!');
     logDay();save();renderAll();
   }
 }
 
+function retakeLesson(){
+  if(!S.topic)return;
+  var id=S.topic;
+  // Remove from cache to force regeneration
+  delete S.cache[id];
+  // Reset answers
+  LESSON_ANSWERS=[];
+  loadLesson(id);
+  toast('🔄 Урок перезапущен','ok');
+}
+
 function renderLesson(les){
   document.getElementById('ltitle').textContent=les.title||tname(S.topic);
-  let h='';
+  LESSON_ANSWERS=[];
+  LESSON_RELATED=les.related||[];
+  LESSON_EXAMPLES=les.examples||[];
+  if(les.practice)les.practice.forEach(function(p){LESSON_ANSWERS.push(p.a||'');});
+  var h='';
   h+='<div class="ls"><div class="lh">📖 ОБЪЯСНЕНИЕ</div><div class="lt">'+(les.explanation||'').replace(/\n/g,'<br>')+'</div></div>';
-  if(les.grammar_focus?.length)h+='<div class="ls"><div class="lh">📐 ГЛАВНОЕ</div><div>'+les.grammar_focus.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div></div>';
-  if(les.examples?.length)h+='<div class="ls"><div class="lh">💡 ПРИМЕРЫ</div>'+les.examples.map(e=>'<div class="exb"><div class="exr">'+e.ru+'</div>'+(e.note?'<div class="exn">📝 '+e.note+'</div>':'')+'</div>').join('')+'</div>';
-  if(les.common_mistakes?.length)h+='<div class="ls"><div class="lh">🚫 ЧАСТЫЕ ОШИБКИ</div>'+les.common_mistakes.map(m=>'<div class="errb"><div class="errw">✗ '+m.wrong+'</div><div class="errr">✓ '+m.correct+'</div><div class="errx">'+m.reason+'</div></div>').join('')+'</div>';
-  if(les.practice?.items?.length){
-    h+='<div class="ls"><div class="lh">✍️ ПРАКТИКА</div>';
-    les.practice.items.forEach((ex,i)=>{
-      h+='<div class="exc"><div class="exq">'+(i+1)+'. '+(ex.q||ex.question||'')+'</div>'
-        +(ex.hint?'<div style="font-size:10px;color:var(--muted);margin-bottom:6px">💡 Подсказка: '+ex.hint+'</div>':'')
-        +'<input class="exi" id="a'+i+'" placeholder="Ваш ответ..." autocomplete="off">'
-        +'<div class="exf" id="f'+i+'"></div>'
-        +'<button class="cb" onclick="chkAns('+i+','+JSON.stringify(ex.a||ex.answer||'')+')">Проверить</button>'
-        +'</div>';
+  if(les.grammar_focus&&les.grammar_focus.length){h+='<div class="ls"><div class="lh">📐 ГЛАВНОЕ</div><div>';les.grammar_focus.forEach(function(g){h+='<span class="gtag">'+g+'</span>';});h+='</div></div>';}
+  if(les.examples&&les.examples.length){
+    h+='<div class="ls"><div class="lh">💡 ПРИМЕРЫ</div>';
+    les.examples.forEach(function(e,ei){
+      h+='<div class="exb"><div class="ex-row"><div><div class="exr">'+e.ru+'</div>'+(e.note?'<div class="exn">📝 '+e.note+'</div>':'')+'</div>'
+        +'<button class="speak-btn" onclick="speak('+ei+')" title="Произношение">🔊</button>'
+        +'</div></div>';
     });
     h+='</div>';
   }
-  if(les.cultural_note)h+='<div class="ls"><div class="lh">🌍 КОНТЕКСТ</div><div class="lt">'+les.cultural_note+'</div></div>';
-  if(les.related?.length)h+='<div class="ls"><div class="lh">🔗 ИЗУЧИТЬ ДАЛЕЕ</div><div class="rw">'+les.related.map(r=>'<span class="ttag" onclick="loadFree2('+JSON.stringify(r)+')">→ '+r+'</span>').join('')+'</div></div>';
+  if(les.common_mistakes&&les.common_mistakes.length){
+    h+='<div class="ls"><div class="lh">🚫 ЧАСТЫЕ ОШИБКИ</div>';
+    les.common_mistakes.forEach(function(m){
+      h+='<div class="errb"><div class="errw">✗ '+m.wrong+'</div><div class="errr">✓ '+m.correct+'</div><div class="errx">'+m.reason+'</div></div>';
+    });
+    h+='</div>';
+  }
+  if(les.practice&&les.practice.length){
+    h+='<div class="ls"><div class="lh">✍️ ПРАКТИКА</div>';
+    les.practice.forEach(function(p,pi){
+      h+='<div class="prac-item" id="prac_'+pi+'">'
+        +'<div class="prac-q">'+(pi+1)+'. '+(p.q||'')+'</div>'
+        +(p.hint?'<div class="prac-hint">💡 '+p.hint+'</div>':'')
+        +'<input class="prac-inp" id="pinp_'+pi+'" placeholder="Ваш ответ..." autocomplete="off">'
+        +'<div class="prac-feed" id="pfeed_'+pi+'"></div>'
+        +'<div class="prac-btns">'
+        +'<button class="chk-btn" onclick="checkAns('+pi+')">Проверить</button>'
+        +'<button class="hint-btn" id="phint_'+pi+'" onclick="showHint('+pi+')">💡 Показать ответ</button>'
+        +'</div></div>';
+    });
+    h+='</div>';
+    setTimeout(function(){
+      les.practice.forEach(function(p,pi){
+        var inp=document.getElementById('pinp_'+pi);
+        if(inp)inp.addEventListener('keypress',function(e){if(e.key==='Enter')checkAns(pi);});
+      });
+    },100);
+  }
+  if(les.cultural_note){h+='<div class="ls"><div class="lh">🌍 КОНТЕКСТ</div><div class="lt">'+les.cultural_note+'</div></div>';}
+  if(les.related&&les.related.length){
+    h+='<div class="ls"><div class="lh">🔗 ИЗУЧИТЬ ДАЛЕЕ</div><div class="rw">';
+    les.related.forEach(function(r,ri){h+='<span class="ttag" onclick="openRelated('+ri+')">→ '+r+'</span>';});
+    h+='</div></div>';
+  }
   document.getElementById('lcont').innerHTML=h;
 }
 
-// CHECK ANSWER — умная проверка
-window.chkAns=async(i,correct)=>{
-  const inp=document.getElementById('a'+i);
-  const feed=document.getElementById('f'+i);
-  const user=inp.value.trim();
-  if(!user)return;
-  function norm(s){return s.toLowerCase().replace(/[.,!?;:—]/g,'').replace(/\s+/g,' ').replace(/ё/g,'е').trim();}
-  const uN=norm(user),cN=norm(correct);
-  const isOk=uN===cN||(cN.length>3&&(cN.includes(uN)||uN.includes(cN.split(' ')[0])));
+// TTS
+function speak(idx){
+  if(!window.speechSynthesis){toast('TTS не поддерживается','ok');return;}
+  var ex=LESSON_EXAMPLES[idx];if(!ex)return;
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(ex.ru);u.lang='ru-RU';u.rate=0.85;
+  var voices=window.speechSynthesis.getVoices();
+  for(var i=0;i<voices.length;i++){if(voices[i].lang&&voices[i].lang.startsWith('ru')){u.voice=voices[i];break;}}
+  window.speechSynthesis.speak(u);
+}
+
+// CHECK ANSWER
+var FAIL_CNT={};
+function checkAns(idx){
+  var inp=document.getElementById('pinp_'+idx);
+  var feed=document.getElementById('pfeed_'+idx);
+  var hintBtn=document.getElementById('phint_'+idx);
+  if(!inp||!feed)return;
+  var user=inp.value.trim();
+  if(!user){inp.style.borderColor='var(--warn)';setTimeout(function(){inp.style.borderColor='';},1500);return;}
+  var correct=LESSON_ANSWERS[idx]||'';
+  function norm(s){return s.toLowerCase().replace(/[.,!?;:—«»()]/g,'').replace(/\s+/g,' ').replace(/ё/g,'е').trim();}
+  var u=norm(user),c=norm(correct);
+  var cu=c.split(' '),uu=u.split(' ');
+  var isOk=!c||u===c||(cu[0]===uu[0]&&cu.length<=2)||(c.indexOf(u)!==-1&&u.length>=3)||(u.indexOf(c)!==-1&&c.length>=3);
+  inp.classList.remove('ok','no');feed.innerHTML='';
   if(isOk){
     inp.classList.add('ok');
-    feed.innerHTML='<span style="color:var(--success)">✅ Верно! Отлично.</span>';
-    addXP(10,'✅ +10 XP');return;
+    feed.innerHTML='<span style="color:var(--ok);font-weight:700">✅ Верно! Отлично.</span>';
+    addXP(10,'✅ +10 XP');
+    FAIL_CNT[idx]=0;return;
   }
   inp.classList.add('no');
+  FAIL_CNT[idx]=(FAIL_CNT[idx]||0)+1;
+  if(FAIL_CNT[idx]>=2&&hintBtn)hintBtn.style.display='block';
   feed.innerHTML='<span class="spin spins"></span>';
-  const hint=await ai('Ты репетитор. Объясни ошибку ученика кратко (1 предложение). Будь мягким.','Правильный ответ: "'+correct+'". Ответ ученика: "'+user+'". Объясни кратко.',80);
-  feed.innerHTML='❌ '+(hint||'Не совсем верно.')+'<br><strong>Правильно: '+correct+'</strong>';
-  if(S.topic&&!S.weak.includes(S.topic)){S.weak.push(S.topic);save();}
-};
-window.nextLesson=()=>{
-  if(S.topicIdx<AT.length-1)loadLesson(AT[S.topicIdx+1].id);
-  else toast('🎉 Весь курс пройден! Вы великолепны!','ok');
-};
-
-// FREE TOPIC
-window.loadFree=async()=>{
-  const inp=document.getElementById('ftopic');
-  const t=inp.value.trim();if(!t)return;
-  inp.value='';loadFree2(t);
-};
-async function loadFree2(topic){
-  const fid='f_'+topic.slice(0,15).replace(/\s/g,'_');
-  S.topic=fid;
-  if(!S.history.includes(topic)){S.history.unshift(topic);if(S.history.length>30)S.history.pop();}
-  goScreen('s-lesson');setNav('n-learn');
-  document.getElementById('lpos').textContent='Свободная тема';
-  document.getElementById('ltitle').textContent=topic;
-  document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:40px"><span class="spin"></span><div style="margin-top:12px;color:var(--muted);font-size:12px">AI анализирует тему...</div></div>';
-  const cached=S.cache[fid];
-  let lesson;
-  if(cached){lesson=cached;}
-  else if(!S.offline&&S.key){
-    const sys='Ты профессор русского языка. Отвечай ТОЛЬКО JSON без markdown.';
-    const usr='Тема: "'+topic+'". Уровень: '+S.level+'.\nJSON: {"title":"...","explanation":"...","grammar_focus":[],"examples":[{"ru":"...","note":"..."}],"common_mistakes":[{"wrong":"...","correct":"...","reason":"..."}],"practice":{"items":[{"q":"...","a":"...","hint":"..."}]},"flashcards":[{"f":"...","b":"...","c":"..."}],"cultural_note":"...","related":[]}';
-    const raw=await ai(sys,usr,2000);
-    lesson=parseJSON(raw,false);
-    if(!lesson)lesson={title:topic,explanation:'Не удалось разобрать ответ AI. Попробуйте ещё раз.',grammar_focus:[],examples:[],common_mistakes:[],practice:{items:[]},related:[]};
-    else if(lesson.flashcards?.length)addCards(lesson.flashcards);
+  trackError(S.topic,'practice');
+  if(!S.offline&&S.key&&correct){
+    aiCall('Ты репетитор. Объясни ошибку в 1 предложении. Будь мягким.',
+      'Правильно: "'+correct+'". Ответ: "'+user+'".',60,
+      function(hint){feed.innerHTML='<span style="color:var(--err)">❌ '+(hint||'Неверно.')+'</span><br><strong style="color:var(--ok)">✓ '+correct+'</strong>';});
   }else{
-    lesson={title:topic,explanation:'В офлайн-режиме свободные темы недоступны. Подключите ключ Groq на console.groq.com (бесплатно).',grammar_focus:[],examples:[],common_mistakes:[],practice:{items:[]},related:[]};
+    feed.innerHTML='<span style="color:var(--err)">❌ Неверно.</span><br><strong style="color:var(--ok)">✓ '+correct+'</strong>';
   }
-  S.cache[fid]=lesson;S.progress=Math.min(100,S.progress+2);
-  addXP(30,'🔍 +30 XP');logDay();save();renderAll();renderLesson(lesson);
+  if(S.topic&&S.weak.indexOf(S.topic)===-1){S.weak.push(S.topic);save();}
 }
-window.loadFree2=loadFree2;
+function showHint(idx){
+  var c=LESSON_ANSWERS[idx]||'';
+  var inp=document.getElementById('pinp_'+idx);
+  if(inp&&c){inp.value=c;inp.classList.remove('no');inp.classList.add('ok');
+    var feed=document.getElementById('pfeed_'+idx);
+    if(feed)feed.innerHTML='<span style="color:var(--warn)">💡 Ответ показан. Запомните!</span>';
+    var h=document.getElementById('phint_'+idx);if(h)h.style.display='none';
+  }
+}
+function openRelated(ri){var t=LESSON_RELATED[ri];if(t)loadFree2(t);}
+function nextLesson(){
+  if(S.topicI<AT.length-1)loadLesson(AT[S.topicI+1].id);
+  else toast('🎉 Весь курс пройден! Вы великолепны!','ok');
+}
 
-// DAILY QUIZ
-let QD=null,QA=[],QI=0;
-window.loadQuiz=async()=>{
-  const c=document.getElementById('qcont');
+// ═══════════════════════════════════════════════════════
+// FREE TOPIC
+// ═══════════════════════════════════════════════════════
+function loadFree(){
+  var t=document.getElementById('ftopic').value.trim();
+  if(!t)return;document.getElementById('ftopic').value='';loadFree2(t);
+}
+function loadFree2(topic){
+  var fid='free_'+topic.replace(/\s+/g,'_').slice(0,20);
+  S.topic=fid;
+  if(S.history.indexOf(topic)===-1){S.history.unshift(topic);if(S.history.length>30)S.history.pop();}
+  nav('s-lesson','n-learn');
+  document.getElementById('lpos').textContent='Свободная тема';
+  document.getElementById('les-prog-fill').style.width='100%';
+  document.getElementById('ltitle').textContent=topic;
+  document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:40px"><span class="spin"></span><div style="margin-top:12px;color:var(--mut);font-size:12px">AI анализирует тему...</div></div>';
+  var cached=S.cache[fid];
+  if(cached){renderLesson(cached);return;}
+  if(S.offline||!S.key){renderLesson({title:topic,explanation:'Офлайн: подключите Groq на console.groq.com.',grammar_focus:[],examples:[],common_mistakes:[],practice:[],related:[]});return;}
+  var sys='Ты профессор русского языка. Только JSON без markdown.';
+  var usr='Тема: "'+topic+'". Уровень: '+S.level+'.\nJSON: {"title":"...","explanation":"...","grammar_focus":[],"examples":[{"ru":"...","note":"..."}],"common_mistakes":[{"wrong":"...","correct":"...","reason":"..."}],"practice":[{"q":"...","a":"...","hint":"..."}],"flashcards":[{"f":"...","b":"...","c":"..."}],"cultural_note":"...","related":[]}';
+  aiCall(sys,usr,2000,function(raw){
+    var lesson=parseJ(raw,false);
+    if(!lesson)lesson={title:topic,explanation:'Ошибка AI. Попробуйте ещё раз.',grammar_focus:[],examples:[],common_mistakes:[],practice:[],related:[]};
+    if(lesson.flashcards)addCards(lesson.flashcards);
+    S.cache[fid]=lesson;S.progress=Math.min(100,S.progress+2);
+    addXP(30,'🔍 +30 XP');logDay();save();renderAll();renderLesson(lesson);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════
+var QD=null,QA=[],QI=0;
+function loadQuiz(){
   if(QD&&QA.length<QD.length){renderQ();return;}
   if(S.quizDone&&QD){showQRes();return;}
-  c.innerHTML='<div style="text-align:center;padding:30px"><span class="spin"></span><div style="margin-top:12px;color:var(--muted);font-size:12px">AI готовит тест...</div></div>';
+  var cont=document.getElementById('qcont');
+  cont.innerHTML='<div style="text-align:center;padding:30px"><span class="spin"></span><div style="margin-top:12px;color:var(--mut);font-size:12px">AI готовит тест...</div></div>';
   if(S.offline||!S.key){QD=builtinQ();QA=[];QI=0;renderQ();return;}
-  const pool=[...new Set([...S.weak,...S.completed])].slice(0,5);
-  const topics=pool.length?pool.map(tname).join(', '):'местоимения, глаголы, падежи, числа';
-  const sys='Ты профессор. Отвечай ТОЛЬКО JSON массивом без markdown.';
-  const usr='Создай 10 вопросов-тестов по теме: "'+topics+'". Уровень: '+S.level+'.\nВопросы разнообразные: грамматика, выбор правильной формы, исправление ошибок.\nJSON массив (ровно 10):\n[{"q":"вопрос","opts":["А) вариант","Б) вариант","В) вариант","Г) вариант"],"correct":0,"explain":"объяснение правильного ответа"}]';
-  const raw=await ai(sys,usr,2000);
-  QD=parseJSON(raw,true);
-  if(!Array.isArray(QD)||QD.length<5)QD=builtinQ();
-  QA=[];QI=0;renderQ();
-};
+  var pool=[];
+  S.weak.forEach(function(id){if(pool.indexOf(id)===-1)pool.push(id);});
+  S.done.forEach(function(id){if(pool.indexOf(id)===-1)pool.push(id);});
+  pool=pool.slice(0,5);
+  var topics=pool.length?pool.map(function(id){return tname(id);}).join(', '):'местоимения, глаголы, падежи, числа';
+  var sys='Ты профессор. Только JSON массивом без markdown.';
+  var usr='Создай 10 вопросов по теме: "'+topics+'". Уровень: '+S.level+'.\nJSON:[{"q":"вопрос","opts":["А) ...","Б) ...","В) ...","Г) ..."],"correct":0,"explain":"объяснение"}]';
+  aiCall(sys,usr,2000,function(raw){
+    var res=parseJ(raw,true);
+    QD=(Array.isArray(res)&&res.length>=5)?res:builtinQ();
+    QA=[];QI=0;renderQ();
+  });
+}
 function builtinQ(){return[
-  {q:'Выберите правильный ответ: "Как вас зовут?"',opts:['А) Я есть Иван','Б) Меня зовут Иван','В) Мне зовут Иван','Г) Я Иван есть'],correct:1,explain:'"Меня зовут" — стандартная формула представления в русском языке.'},
-  {q:'Как сказать "Я из Душанбе"?',opts:['А) Я с Душанбе','Б) Я от Душанбе','В) Я из Душанбе','Г) Я в Душанбе'],correct:2,explain:'ИЗ + родительный падеж = место происхождения. Я из Душанбе — верно.'},
-  {q:'Выберите НСВ (процесс):',opts:['А) прочитать','Б) написать','В) читать','Г) сделать'],correct:2,explain:'ЧИТАТЬ — НСВ (процесс). Прочитать/написать/сделать — СВ (результат).'},
-  {q:'Какой падеж отвечает на "Кого? Чего?"?',opts:['А) Именительный','Б) Родительный','В) Дательный','Г) Винительный'],correct:1,explain:'Родительный падеж — Кого? Чего? Используется после: нет, из, без, до, от, у.'},
-  {q:'Выберите правильную форму: Я ___ по-русски. (говорить)',opts:['А) говорю','Б) говоришь','В) говорит','Г) говорим'],correct:0,explain:'Я говорю — 1-е лицо ед.ч. Спряжение: я -ю, ты -ишь, он -ит.'},
-  {q:'"Я из Москвы" — какой падеж у слова МОСКВЫ?',opts:['А) Именительный','Б) Родительный','В) Дательный','Г) Предложный'],correct:1,explain:'После предлога ИЗ всегда родительный падеж. Москва → Москвы.'},
-  {q:'Как сказать "Я не понимаю"?',opts:['А) Я не понимаю','Б) Я не понимает','В) Мне не понимаю','Г) Я не понимаешь'],correct:0,explain:'Я не понимаю — отрицание НЕ + глагол в 1-м лице ед.ч.'},
-  {q:'Как правильно приветствовать незнакомого взрослого?',opts:['А) Привет!','Б) Здравствуйте!','В) Хай!','Г) Приветик!'],correct:1,explain:'Здравствуйте — официальное приветствие. Привет — только для друзей.'},
-  {q:'Исправьте ошибку: "Вчера я уже читал эту книгу."',opts:['А) Вчера я уже прочитал эту книгу.','Б) Вчера я читал уже эту книгу.','В) Ошибки нет','Г) Вчера прочитал я эту книгу уже.'],correct:0,explain:'С "уже" нужен СВ (прочитал) — акцент на завершённости. НСВ "читал" неверен.'},
-  {q:'Выберите правильную форму: У меня ___ книга.',opts:['А) есть','Б) нет','В) быть','Г) имею'],correct:0,explain:'У меня ЕСТЬ книга — наличие. У меня НЕТ книги (+ родительный) — отсутствие.'},
+  {q:'Выберите правильный ответ: "Как вас зовут?"',opts:['А) Я есть Иван','Б) Меня зовут Иван','В) Мне зовут Иван','Г) Я Иван есть'],correct:1,explain:'"Меня зовут" — стандартная формула. "Я есть" — ошибка.'},
+  {q:'Как правильно: "Я из Душанбе"?',opts:['А) Я с Душанбе','Б) Я от Душанбе','В) Я из Душанбе','Г) Я в Душанбе'],correct:2,explain:'ИЗ + родительный = место происхождения.'},
+  {q:'Выберите НСВ глагол (процесс):',opts:['А) прочитать','Б) написать','В) читать','Г) сделать'],correct:2,explain:'ЧИТАТЬ — НСВ (процесс). Остальные — СВ.'},
+  {q:'Падеж на вопрос "Кого? Чего?"?',opts:['А) Именительный','Б) Родительный','В) Дательный','Г) Винительный'],correct:1,explain:'Родительный — Кого? Чего? После: нет, из, без, от.'},
+  {q:'Правильная форма: Я ___ по-русски.',opts:['А) говорю','Б) говоришь','В) говорит','Г) говорим'],correct:0,explain:'Я говорю — 1-е лицо ед.ч.'},
+  {q:'"Я из Москвы" — падеж слова МОСКВЫ?',opts:['А) Именительный','Б) Родительный','В) Дательный','Г) Предложный'],correct:1,explain:'После ИЗ — родительный. Москва → Москвы.'},
+  {q:'Как сказать "Я не понимаю"?',opts:['А) Я не понимаю','Б) Я не понимает','В) Мне не понимаю','Г) Я не понимаешь'],correct:0,explain:'Я не понимаю — НЕ + 1-е лицо ед.ч.'},
+  {q:'Приветствие незнакомому взрослому?',opts:['А) Привет!','Б) Здравствуйте!','В) Хай!','Г) Приветик!'],correct:1,explain:'Здравствуйте — официально. Привет — только друзьям.'},
+  {q:'Исправьте: "Я уже читал эту книгу."',opts:['А) Я уже прочитал эту книгу.','Б) Я читал уже эту книгу.','В) Ошибки нет','Г) Прочитал я уже.'],correct:0,explain:'С "уже" нужен СВ (прочитал).'},
+  {q:'Правильная форма: У меня ___ книга.',opts:['А) есть','Б) нет','В) быть','Г) имею'],correct:0,explain:'У меня ЕСТЬ — наличие. У меня НЕТ книги — отсутствие.'}
 ];}
 function renderQ(){
-  const c=document.getElementById('qcont');
+  var cont=document.getElementById('qcont');
   if(QI>=QD.length){showQRes();return;}
-  const q=QD[QI];
-  const pct=Math.round((QI/QD.length)*100);
-  let h='<div><div class="qmeta"><span>Вопрос '+(QI+1)+'/'+QD.length+'</span><span style="color:var(--success)">✅ '+QA.filter(Boolean).length+' верно</span></div>'
-    +'<div class="qprog"><div class="qpf" style="width:'+pct+'%"></div></div></div>'
+  var q=QD[QI];var pct=Math.round((QI/QD.length)*100);
+  var html='<div class="qmeta"><span>Вопрос '+(QI+1)+'/'+QD.length+'</span><span style="color:var(--ok)">✅ '+QA.filter(function(a){return a;}).length+' верно</span></div>'
+    +'<div class="qprog"><div class="qpf" style="width:'+pct+'%"></div></div>'
     +'<div class="qcard"><div class="qq">'+q.q+'</div><div class="qopts">';
-  q.opts.forEach((o,i)=>{
-    h+='<button class="qo" id="qo'+i+'" onclick="pickAns('+i+')">'+o+'</button>';
-  });
-  h+='</div><div id="qex" style="display:none" class="qex"></div>'
-    +'<button id="qnxt" class="btn bp" onclick="nextQ()" style="display:none;margin-top:12px">Следующий вопрос →</button></div>';
-  c.innerHTML=h;
+  q.opts.forEach(function(o,i){html+='<button class="qo" id="qo_'+i+'" onclick="pickQ('+i+')">'+o+'</button>';});
+  html+='</div><div id="qex" style="display:none" class="qex"></div>'
+    +'<button id="qnxt" class="btn bp" onclick="nextQ()" style="display:none;margin-top:12px">Следующий →</button></div>';
+  cont.innerHTML=html;
 }
-window.pickAns=(ch)=>{
-  const q=QD[QI];const ok=ch===q.correct;
-  for(let i=0;i<q.opts.length;i++){
-    const b=document.getElementById('qo'+i);if(!b)continue;
-    b.disabled=true;b.onclick=null;
-    if(i===q.correct)b.classList.add('rok');
-    if(i===ch&&!ok)b.classList.add('sno');
-    if(i===ch&&ok)b.classList.add('sok');
-  }
-  document.getElementById('qex').style.display='block';
-  document.getElementById('qex').innerHTML=(ok?'✅ ':'❌ ')+(q.explain||'');
-  document.getElementById('qnxt').style.display='block';
+function pickQ(ch){
+  var q=QD[QI];var ok=ch===q.correct;
+  for(var i=0;i<q.opts.length;i++){var b=document.getElementById('qo_'+i);if(!b)continue;b.disabled=true;b.onclick=null;if(i===q.correct)b.classList.add('rok');if(i===ch&&!ok)b.classList.add('sno');if(i===ch&&ok)b.classList.add('sok');}
+  var ex=document.getElementById('qex');if(ex){ex.style.display='block';ex.innerHTML=(ok?'✅ ':'❌ ')+(q.explain||'');}
+  var nxt=document.getElementById('qnxt');if(nxt)nxt.style.display='block';
   QA.push(ok);if(ok)addXP(15,'🎯 +15 XP');
-};
-window.nextQ=()=>{QI++;if(QI>=QD.length)showQRes();else renderQ();};
+}
+function nextQ(){QI++;if(QI>=QD.length)showQRes();else renderQ();}
 function showQRes(){
-  const ok=QA.filter(Boolean).length;
-  const tot=QD.length;
-  const pct=Math.round((ok/tot)*100);
+  var ok=QA.filter(function(a){return a;}).length;
+  var tot=QD.length;var pct=Math.round((ok/tot)*100);
   S.quizDone=true;save();
-  const grade=pct>=90?'🏆 Отлично!':pct>=70?'🌟 Хорошо!':pct>=50?'📚 Продолжайте':'💪 Нужно повторить';
-  document.getElementById('qcont').innerHTML=
-    '<div style="text-align:center;padding:20px 0">'
+  var grade=pct>=90?'🏆 Отлично!':pct>=70?'🌟 Хорошо!':pct>=50?'📚 Продолжайте':'💪 Нужно повторить';
+  document.getElementById('qcont').innerHTML='<div style="text-align:center;padding:20px 0">'
     +'<div class="qrs">'+ok+'/'+tot+'</div>'
     +'<div style="font-family:var(--fh);font-size:16px;color:var(--gold);margin-bottom:4px">'+grade+'</div>'
-    +'<div style="font-size:12px;color:var(--muted);margin-bottom:20px">'+pct+'%</div></div>'
+    +'<div style="font-size:12px;color:var(--mut);margin-bottom:20px">'+pct+'%</div></div>'
     +'<div style="display:grid;gap:8px">'
-    +'<button class="btn bp" onclick="QD=null;QA=[];QI=0;S.quizDone=false;loadQuiz()">🔄 Пройти ещё раз</button>'
-    +'<button class="btn bo" onclick="gotoLearn()">📚 К урокам</button></div>';
+    +'<button class="btn bp" onclick="QD=null;QA=[];QI=0;S.quizDone=false;loadQuiz()">🔄 Ещё раз</button>'
+    +'<button class="btn bo" onclick="nav(\'s-learn\',\'n-learn\');renderCurr()">📚 К урокам</button></div>';
   addXP(pct,'🎯 Тест завершён!');renderAll();
 }
 
+// ═══════════════════════════════════════════════════════
 // FLASHCARDS
-function addCards(cs){
-  cs.forEach(c=>{if(!S.cards.find(x=>x.f===c.f)){S.cards.push({...c,interval:1,ease:2.5,next:0,reps:0});}});save();
-}
-window.startFC=()=>{
-  const now=Date.now();
-  S.fcQ=S.cards.filter(c=>c.next<=now).slice(0,20);
+// ═══════════════════════════════════════════════════════
+function startFC(){
+  var now=Date.now();
+  S.fcQ=S.cards.filter(function(c){return c.next<=now;}).slice(0,20);
   if(!S.fcQ.length){toast('🎉 Все карточки повторены!','ok');return;}
   S.fcI=0;S.fcFlip=false;S.fcOk=0;S.fcAg=0;
-  goScreen('s-fc');setNav('n-home');updFC();
-};
+  nav('s-fc','n-more');updFC();
+}
 function updFC(){
-  const c=S.fcQ[S.fcI];
+  var c=S.fcQ[S.fcI];
   document.getElementById('fcrem').textContent=S.fcQ.length-S.fcI;
   document.getElementById('fcok').textContent=S.fcOk;
   document.getElementById('fcag').textContent=S.fcAg;
   document.getElementById('fcf').style.display='block';
   document.getElementById('fcb').style.display='none';
-  document.getElementById('fcf').textContent=c?.f||'—';
-  document.getElementById('fcb').textContent=c?.b||'';
-  document.getElementById('fcc').textContent=c?.c||'';
+  document.getElementById('fcc').style.display='none';
+  document.getElementById('fcf').textContent=c?c.f:'—';
+  document.getElementById('fcb').textContent=c?c.b:'';
+  document.getElementById('fcc').textContent=c?c.c:'';
   document.getElementById('fcctrl').style.display='none';
   S.fcFlip=false;
 }
-window.flipFC=()=>{
+function flipFC(){
   if(S.fcFlip)return;S.fcFlip=true;
   document.getElementById('fcf').style.display='none';
   document.getElementById('fcb').style.display='block';
+  document.getElementById('fcc').style.display='block';
   document.getElementById('fcctrl').style.display='grid';
-};
-window.rateFC=(r)=>{
-  const c=S.fcQ[S.fcI];
-  const o=S.cards.find(x=>x.f===c.f);if(!o)return;
-  const now=Date.now();
+}
+function rateFC(r){
+  var c=S.fcQ[S.fcI];var o=null;
+  for(var i=0;i<S.cards.length;i++){if(S.cards[i].f===c.f){o=S.cards[i];break;}}
+  if(!o)return;var now=Date.now();
   if(r==='easy'){o.ease=Math.min(o.ease+0.15,4);o.interval=Math.round(o.interval*o.ease);o.reps++;S.fcOk++;addXP(5);}
   else if(r==='hard'){o.interval=Math.max(1,Math.round(o.interval*1.2));o.reps++;S.fcOk++;addXP(2);}
   else{o.ease=Math.max(o.ease-0.2,1.3);o.interval=1;o.reps=0;S.fcAg++;}
   o.next=now+o.interval*86400000;save();
   S.fcI++;
-  if(S.fcI>=S.fcQ.length){toast('✅ Готово! Верно: '+S.fcOk+'/'+S.fcQ.length,'ok');gotoHome();renderAll();}
+  if(S.fcI>=S.fcQ.length){toast('✅ Готово! Верно: '+S.fcOk+'/'+S.fcQ.length,'ok');nav('s-home','n-home');renderAll();}
   else updFC();
-};
+}
 
+// ═══════════════════════════════════════════════════════
 // TEXT CHECK
-window.checkText=async()=>{
-  const txt=document.getElementById('tinp').value.trim();
-  const btn=document.getElementById('chkbtn');
-  const res=document.getElementById('tres');
+// ═══════════════════════════════════════════════════════
+function checkText(){
+  var txt=document.getElementById('tinp').value.trim();
+  var btn=document.getElementById('chkbtn');var res=document.getElementById('tres');
   if(txt.length<5){toast('Текст слишком короткий','ok');return;}
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> Анализ...';res.style.display='none';
   if(S.offline||!S.key){
-    res.innerHTML='<p>Для анализа текста необходим API-ключ. Получите бесплатный ключ на console.groq.com</p>';
+    res.innerHTML='<p>Нужен API-ключ. Получите бесплатно на <strong>console.groq.com</strong></p>';
     res.style.display='block';btn.disabled=false;btn.innerHTML='&#128269; Анализировать';return;
   }
-  const sys='Ты редактор и преподаватель русского языка. Отвечай ТОЛЬКО JSON без markdown.';
-  const usr='Проверь текст. Верни JSON:\n{"corrected":"полный исправленный текст","score":85,"errors":[{"wrong":"ошибка","correct":"исправление","reason":"объяснение","type":"грамматика"}],"feedback":"общий отзыв"}\nТекст: '+JSON.stringify(txt);
-  const raw=await ai(sys,usr,1200);
-  if(!raw){
-    res.innerHTML='<p style="color:var(--error)">Ошибка соединения. Попробуйте ещё раз.</p>';
-    res.style.display='block';btn.disabled=false;btn.innerHTML='&#128269; Анализировать';return;
-  }
-  const data=parseJSON(raw,false);
-  if(data){
-    const tc={'орфография':'var(--error)','грамматика':'var(--warn)','пунктуация':'var(--accent)','стилистика':'var(--ai)'};
-    let h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
-      +'<span style="font-family:var(--fh);font-size:20px;font-weight:900;color:var(--success)">'+(data.score||'—')+'/100</span>'
-      +'<span style="font-size:11px;color:var(--muted)">'+(data.feedback||'')+'</span></div>';
-    h+='<div style="font-family:var(--fh);font-size:10px;color:var(--success);margin-bottom:5px;letter-spacing:.5px">ИСПРАВЛЕННЫЙ ТЕКСТ:</div>';
-    h+='<p style="margin-bottom:12px;line-height:1.6;background:rgba(0,230,118,0.05);padding:10px;border-radius:8px">'+(data.corrected||txt)+'</p>';
-    if(data.errors?.length){
-      h+='<div style="font-family:var(--fh);font-size:10px;color:var(--warn);margin-bottom:8px">РАЗБОР ОШИБОК ('+data.errors.length+'):</div>';
-      data.errors.forEach(er=>{
-        const cl=tc[er.type]||'var(--muted)';
-        h+='<div class="errb"><span style="color:'+cl+';font-size:9px;font-family:var(--fh);text-transform:uppercase">'+(er.type||'ошибка')+'</span>'
-          +'<div class="errw">✗ '+er.wrong+'</div><div class="errr">✓ '+er.correct+'</div><div class="errx">'+er.reason+'</div></div>';
-      });
-    }else{h+='<p style="color:var(--success)">✅ Ошибок не найдено. Текст написан правильно!</p>';}
-    res.innerHTML=h;addXP(20,'📝 +20 XP');
-  }else{
-    res.innerHTML='<div style="font-size:12px;line-height:1.6;white-space:pre-wrap">'+raw+'</div>';
-  }
-  res.style.display='block';btn.disabled=false;btn.innerHTML='&#128269; Анализировать';
-};
-
-// AI CHAT
-const CH=[];
-window.sendChat=async()=>{
-  const inp=document.getElementById('cinp');
-  const txt=inp.value.trim();if(!txt)return;
-  addMsg('user',txt);inp.value='';
-  CH.push({role:'user',content:txt});
-  const t=document.createElement('div');t.className='msg ai';
-  t.innerHTML='<span class="td"></span><span class="td"></span><span class="td"></span>';
-  document.getElementById('chatw').appendChild(t);scrollChat();
-  if(S.offline||!S.key){setTimeout(()=>{t.remove();addMsg('ai','Офлайн режим. Для диалога нужен API-ключ. Получите бесплатно на console.groq.com');},400);return;}
-  const sys='Ты профессор русского языка и дружелюбный репетитор. Уровень студента: '+S.level+'.\nОбъясняй на русском языке. Если студент пишет фразу — сначала проверь на ошибки, потом отвечай. Давай примеры. Кратко (3-4 предложения максимум).';
-  const ctx=CH.slice(-6).map(m=>(m.role==='user'?'Студент':'AI')+': '+m.content).join('\n');
-  const raw=await ai(sys,ctx,250);
-  t.remove();
-  const reply=raw||'Ошибка соединения. Попробуйте ещё раз.';
-  addMsg('ai','<strong>&#129504; AI:</strong> '+reply);
-  CH.push({role:'assistant',content:reply});
-  addXP(5);save();
-};
-function addMsg(tp,html){
-  const w=document.getElementById('chatw');
-  const el=document.createElement('div');el.className='msg '+tp;el.innerHTML=html;
-  w.appendChild(el);scrollChat();
+  var sys='Ты редактор русского языка. Только JSON без markdown.';
+  var usr='Проверь текст. JSON: {"corrected":"...","score":85,"errors":[{"wrong":"...","correct":"...","reason":"...","type":"грамматика"}],"feedback":"..."}\nТекст: '+txt;
+  aiCall(sys,usr,1200,function(raw){
+    var data=parseJ(raw,false);
+    if(data){
+      var tc={'орфография':'var(--err)','грамматика':'var(--warn)','пунктуация':'var(--acc)','стилистика':'var(--ai)'};
+      var h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+        +'<span style="font-family:var(--fh);font-size:20px;font-weight:900;color:var(--ok)">'+(data.score||'—')+'/100</span>'
+        +'<span style="font-size:11px;color:var(--mut)">'+(data.feedback||'')+'</span></div>';
+      h+='<div style="font-family:var(--fh);font-size:10px;color:var(--ok);margin-bottom:5px">ИСПРАВЛЕННЫЙ ТЕКСТ:</div>';
+      h+='<p style="margin-bottom:12px;line-height:1.6;background:rgba(0,230,118,.05);padding:10px;border-radius:8px">'+(data.corrected||txt)+'</p>';
+      if(data.errors&&data.errors.length){
+        h+='<div style="font-family:var(--fh);font-size:10px;color:var(--warn);margin-bottom:8px">ОШИБКИ ('+data.errors.length+'):</div>';
+        data.errors.forEach(function(er){
+          var cl=tc[er.type]||'var(--mut)';
+          h+='<div class="errb"><span style="color:'+cl+';font-size:9px;font-family:var(--fh);text-transform:uppercase">'+(er.type||'ошибка')+'</span>'
+            +'<div class="errw">✗ '+er.wrong+'</div><div class="errr">✓ '+er.correct+'</div><div class="errx">'+er.reason+'</div></div>';
+        });
+      }else{h+='<p style="color:var(--ok)">✅ Ошибок не найдено!</p>';}
+      res.innerHTML=h;addXP(20,'📝 +20 XP');
+    }else{res.innerHTML='<div style="font-size:12px;white-space:pre-wrap">'+(raw||'Ошибка API')+'</div>';}
+    res.style.display='block';btn.disabled=false;btn.innerHTML='&#128269; Анализировать';
+  });
 }
-function scrollChat(){const w=document.getElementById('chatw');w.scrollTop=w.scrollHeight;}
-window.quickAsk=(q)=>{document.getElementById('cinp').value=q;sendChat();};
 
-// XP
+// ═══════════════════════════════════════════════════════
+// AI CHAT
+// ═══════════════════════════════════════════════════════
+var CH=[];
+function sendChat(){
+  var inp=document.getElementById('cinp');var txt=inp.value.trim();if(!txt)return;
+  addMsg('user',txt);inp.value='';CH.push({role:'user',content:txt});
+  var t=document.createElement('div');t.className='msg ai';t.innerHTML='<span class="td"></span><span class="td"></span><span class="td"></span>';
+  document.getElementById('chatw').appendChild(t);scrollChat();
+  if(S.offline||!S.key){setTimeout(function(){t.remove();addMsg('ai','Офлайн. Нужен ключ Groq на console.groq.com');},400);return;}
+  var sys='Ты профессор русского языка. Уровень студента: '+S.level+'. Объясняй на русском. Проверяй фразы на ошибки. Кратко (3-4 предложения).';
+  var ctx=CH.slice(-6).map(function(m){return(m.role==='user'?'Студент':'AI')+': '+m.content;}).join('\n');
+  aiCall(sys,ctx,250,function(raw){
+    t.remove();var reply=raw||'Ошибка соединения.';
+    addMsg('ai','<strong>🤖 AI:</strong> '+reply);CH.push({role:'assistant',content:reply});
+    addXP(5);save();
+  });
+}
+function addMsg(tp,html){var w=document.getElementById('chatw');var el=document.createElement('div');el.className='msg '+tp;el.innerHTML=html;w.appendChild(el);scrollChat();}
+function scrollChat(){var w=document.getElementById('chatw');w.scrollTop=w.scrollHeight;}
+function quickAsk(q){document.getElementById('cinp').value=q;sendChat();}
+
+// ═══════════════════════════════════════════════════════
+// DIALOG SCENARIOS
+// ═══════════════════════════════════════════════════════
+var SCENES=[
+  {id:'shop',   icon:'🛒',title:'В магазине',    desc:'Покупаете продукты',     role:'Вы — покупатель, AI — продавец'},
+  {id:'cafe',   icon:'☕',title:'В кафе',        desc:'Заказываете еду',         role:'Вы — гость, AI — официант'},
+  {id:'doctor', icon:'🏥',title:'У врача',       desc:'Рассказываете симптомы', role:'Вы — пациент, AI — врач'},
+  {id:'hotel',  icon:'🏨',title:'В гостинице',   desc:'Заселяетесь',            role:'Вы — гость, AI — администратор'},
+  {id:'friend', icon:'👥',title:'Знакомство',    desc:'Познакомьтесь',          role:'Вы знакомитесь с новым человеком'},
+  {id:'taxi',   icon:'🚕',title:'Такси',         desc:'Вызываете такси',        role:'Вы — пассажир, AI — водитель'},
+  {id:'bank',   icon:'🏦',title:'В банке',       desc:'Открываете счёт',        role:'Вы — клиент, AI — сотрудник'},
+  {id:'job',    icon:'💼',title:'Собеседование', desc:'Проходите интервью',     role:'Вы — кандидат, AI — HR'},
+  {id:'street', icon:'🗺️',title:'Спросить дорогу',desc:'Спрашиваете как пройти',role:'Вы заблудились, AI — прохожий'},
+  {id:'airport',icon:'✈️',title:'В аэропорту',   desc:'Регистрация на рейс',   role:'Вы — пассажир, AI — сотрудник'}
+];
+var DSCENE=null,DHIST=[];
+function initDialogScenes(){
+  var cont=document.getElementById('dial-scenes');if(!cont)return;
+  var html='';
+  SCENES.forEach(function(sc){
+    html+='<div class="scene-card" onclick="startScene(\''+sc.id+'\')">'
+      +'<div class="scene-icon">'+sc.icon+'</div>'
+      +'<div class="scene-title">'+sc.title+'</div>'
+      +'<div class="scene-desc">'+sc.desc+'</div></div>';
+  });
+  cont.innerHTML=html;
+  document.getElementById('dial-scenes-card').style.display='block';
+  document.getElementById('dial-chat-card').style.display='none';
+}
+function startScene(id){
+  var sc=null;for(var i=0;i<SCENES.length;i++){if(SCENES[i].id===id){sc=SCENES[i];break;}}
+  if(!sc)return;DSCENE=sc;DHIST=[];
+  document.getElementById('dial-scenes-card').style.display='none';
+  document.getElementById('dial-chat-card').style.display='block';
+  document.getElementById('dial-title').textContent=sc.icon+' '+sc.title;
+  document.getElementById('dial-role').textContent=sc.role;
+  document.getElementById('dial-msgs').innerHTML='';
+  addDial('sys','Сценарий начался. '+sc.role);
+  var inp=document.getElementById('dial-inp');
+  if(inp){inp.onkeypress=function(e){if(e.key==='Enter')sendDialog();};}
+  if(S.offline||!S.key){addDial('ai',getDialStart(id));return;}
+  var sys=buildDialSys(sc);
+  aiCall(sys,'Начни диалог — одна короткая реплика на русском.',100,function(raw){addDial('ai',raw||getDialStart(id));});
+}
+function getDialStart(id){
+  var s={shop:'Здравствуйте! Чем могу помочь?',cafe:'Добрый день! Что будете заказывать?',doctor:'Здравствуйте! На что жалуетесь?',hotel:'Добрый вечер! Вы бронировали номер?',friend:'Привет! Вы здесь новенький?',taxi:'Здравствуйте! Куда едем?',bank:'Добрый день! Чем могу помочь?',job:'Добрый день! Присаживайтесь. Расскажите о себе.',street:'Вам помочь? Вы что-то ищете?',airport:'Здравствуйте! Паспорт и билет, пожалуйста.'};
+  return s[id]||'Здравствуйте!';
+}
+function buildDialSys(sc){
+  return 'Ты играешь роль: '+sc.role+'.\nУровень русского студента: '+S.level+'.\n1. Говори только на русском (1-2 предложения).\n2. Если студент допустил ошибку — исправь в скобках: (Правильно: ...).\n3. Продолжай диалог естественно.\n4. Не выходи из роли.';
+}
+function sendDialog(){
+  var inp=document.getElementById('dial-inp');if(!inp)return;
+  var txt=inp.value.trim();if(!txt)return;
+  addDial('user',txt);inp.value='';DHIST.push({role:'user',content:txt});
+  if(S.offline||!S.key){addDial('ai','Хорошо! (Офлайн — подключите ключ)');return;}
+  var t=document.createElement('div');t.className='dial-msg ai';t.innerHTML='<span class="td"></span><span class="td"></span><span class="td"></span>';
+  var msgs=document.getElementById('dial-msgs');msgs.appendChild(t);msgs.scrollTop=msgs.scrollHeight;
+  var sys=buildDialSys(DSCENE);
+  var ctx=DHIST.slice(-8).map(function(m){return(m.role==='user'?'Студент':'AI')+': '+m.content;}).join('\n');
+  aiCall(sys,ctx,150,function(raw){
+    t.remove();var reply=raw||'Понятно. Продолжайте.';
+    DHIST.push({role:'assistant',content:reply});addDial('ai',reply);
+  });
+}
+function addDial(type,html){
+  var msgs=document.getElementById('dial-msgs');if(!msgs)return;
+  var el=document.createElement('div');el.className='dial-msg '+type;el.innerHTML=html;
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+}
+function resetDialog(){DSCENE=null;DHIST=[];initDialogScenes();}
+
+// ═══════════════════════════════════════════════════════
+// DICTATION
+// ═══════════════════════════════════════════════════════
+var DLVL='words',DCUR='',DPLAYED=false,DOK=0,DERR=0,DSTREAK=0;
+var DITEMS={
+  words:['книга','школа','привет','спасибо','пожалуйста','здравствуйте','хорошо','понимать','говорить','учиться','работать','жить','знать','любить','читать','писать','студент','учитель','город','страна','русский','язык','слово'],
+  phrases:['Как тебя зовут?','Меня зовут Фаридун.','Я из Душанбе.','Как дела?','Спасибо, хорошо!','До свидания!','Где вы живёте?','Я не понимаю.','Повторите, пожалуйста.','Сколько стоит?','Я хочу это купить.','У меня нет книги.','Я иду в школу.','Он говорит по-русски.'],
+  sentences:['Студент каждый день учится в университете.','Я не понимаю это правило, объясните.','Вчера я прочитал интересную книгу.','Она говорит по-русски очень хорошо.','Мы живём в большом красивом городе.','Русский язык — один из богатейших языков мира.']
+};
+function setDictLv(lv){
+  DLVL=lv;
+  document.querySelectorAll('[id^="dlv-"]').forEach(function(b){b.style.borderColor='';b.style.color='';});
+  var btn=document.getElementById('dlv-'+lv);
+  if(btn){btn.style.borderColor='var(--acc)';btn.style.color='var(--acc)';}
+  nextDictItem();
+}
+function nextDictItem(){
+  var pool=DITEMS[DLVL]||DITEMS.words;
+  DCUR=pool[Math.floor(Math.random()*pool.length)];
+  DPLAYED=false;
+  var s=document.getElementById('dict-status');if(s)s.textContent='Нажмите ▶ для начала';
+  var f=document.getElementById('dict-feed');if(f)f.innerHTML='';
+  var inp=document.getElementById('dict-inp');
+  if(inp){inp.value='';inp.classList.remove('ok','no');inp.disabled=false;inp.style.borderColor='';}
+}
+function playDictation(){
+  if(!DCUR)nextDictItem();
+  if(!window.speechSynthesis){var s=document.getElementById('dict-status');if(s)s.textContent='⚠️ TTS не поддерживается';return;}
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(DCUR);u.lang='ru-RU';u.rate=0.8;
+  var vs=window.speechSynthesis.getVoices();
+  for(var i=0;i<vs.length;i++){if(vs[i].lang&&vs[i].lang.startsWith('ru')){u.voice=vs[i];break;}}
+  window.speechSynthesis.speak(u);
+  DPLAYED=true;
+  var s=document.getElementById('dict-status');if(s)s.textContent='🔊 Слушайте...';
+  u.onend=function(){if(s)s.textContent='✏️ Напишите что услышали';var inp=document.getElementById('dict-inp');if(inp)inp.focus();};
+}
+function checkDictation(){
+  if(!DPLAYED){playDictation();return;}
+  var inp=document.getElementById('dict-inp');var feed=document.getElementById('dict-feed');
+  if(!inp||!feed)return;var user=inp.value.trim();
+  if(!user){toast('Напишите ответ!','ok');return;}
+  function norm(s){return s.toLowerCase().replace(/[.,!?;:—«»]/g,'').replace(/\s+/g,' ').replace(/ё/g,'е').trim();}
+  var ok=norm(user)===norm(DCUR);inp.disabled=true;
+  if(ok){
+    inp.classList.add('ok');feed.innerHTML='<span style="color:var(--ok);font-weight:700">✅ Верно!</span>';
+    DOK++;DSTREAK++;
+    addXP(DLVL==='sentences'?20:DLVL==='phrases'?12:8,'🎤 Диктант верно!');
+  }else{
+    inp.classList.add('no');
+    feed.innerHTML='<span style="color:var(--err)">❌ Неверно.</span><br><strong style="color:var(--ok)">✓ '+DCUR+'</strong>';
+    DERR++;DSTREAK=0;trackError('dictation','');
+  }
+  document.getElementById('d-ok').textContent=DOK;
+  document.getElementById('d-err').textContent=DERR;
+  document.getElementById('d-streak').textContent=DSTREAK;
+  setTimeout(function(){nextDictItem();},2200);
+}
+
+// ═══════════════════════════════════════════════════════
+// AI PLAN
+// ═══════════════════════════════════════════════════════
+function generatePlan(){
+  var btn=document.getElementById('gen-plan-btn');var result=document.getElementById('plan-result');
+  if(!btn||!result)return;
+  btn.innerHTML='<span class="spin"></span> Анализ...';btn.disabled=true;
+  if(S.offline||!S.key){renderPlanOffline();result.style.display='block';btn.innerHTML='⚡ Сгенерировать план';btn.disabled=false;return;}
+  var wn=S.weak.filter(function(id){return AT.some(function(t){return t.id===id;});}).map(tname).join(', ')||'нет';
+  var dn=S.done.slice(-5).map(tname).join(', ')||'нет';
+  var nx=AT.filter(function(t){return S.done.indexOf(t.id)===-1;}).slice(0,5).map(function(t){return t.t;}).join(', ');
+  var sys='Ты педагог русского языка. Только JSON без markdown.';
+  var usr='Составь план. Студент: уровень '+S.level+', пройдено '+S.done.length+'/'+AT.length+', прогресс '+S.progress+'%, слабые: '+wn+', последние: '+dn+', серия: '+S.streak+' дней.\n'
+    +'JSON: {"analysis":"2-3 предложения о прогрессе","week":[{"day":"День 1","tasks":["задача1","задача2","задача3"]},{"day":"День 2","tasks":[...]},{"day":"День 3","tasks":[...]},{"day":"День 4","tasks":[...]},{"day":"День 5","tasks":[...]},{"day":"День 6","tasks":[...]},{"day":"День 7","tasks":[...]}],"tips":["подсказка1","подсказка2","подсказка3"],"priority_topic":"важная тема","motivation":"мотивация"}';
+  aiCall(sys,usr,1500,function(raw){
+    btn.innerHTML='⚡ Сгенерировать план';btn.disabled=false;
+    var data=parseJ(raw,false);
+    if(data)renderPlan(data);else renderPlanOffline();
+    result.style.display='block';
+  });
+}
+function renderPlan(data){
+  var ac=document.getElementById('plan-analysis-content');
+  if(ac){
+    var h='<div style="font-size:13px;line-height:1.6;margin-bottom:10px">'+(data.analysis||'')+'</div>';
+    if(data.priority_topic)h+='<div style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:10px;margin-top:8px"><div style="font-family:var(--fh);font-size:10px;color:var(--gold);margin-bottom:4px">🎯 ПРИОРИТЕТ</div><div style="font-size:13px;font-weight:700">'+data.priority_topic+'</div></div>';
+    if(data.motivation)h+='<div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;margin-top:8px"><div style="font-size:12px;color:var(--ok);font-style:italic">💬 '+data.motivation+'</div></div>';
+    ac.innerHTML=h;
+  }
+  var wc=document.getElementById('plan-week-content');
+  if(wc&&data.week){
+    var h='';data.week.forEach(function(day){
+      h+='<div class="plan-day"><div class="plan-day-title">📅 '+day.day+'</div>';
+      if(day.tasks)day.tasks.forEach(function(task){h+='<div class="plan-task"><span style="color:var(--acc)">▸</span>'+task+'</div>';});
+      h+='</div>';
+    });wc.innerHTML=h;
+  }
+  var tc=document.getElementById('plan-tips-content');
+  if(tc&&data.tips){
+    var h='';var icons=['🧠','💡','🎯'];
+    data.tips.forEach(function(tip,i){h+='<div style="background:rgba(191,95,255,.06);border:1px solid rgba(191,95,255,.2);border-radius:10px;padding:12px;margin:6px 0"><div style="font-size:16px;margin-bottom:4px">'+(icons[i]||'💡')+'</div><div style="font-size:12px;line-height:1.5">'+tip+'</div></div>';});
+    tc.innerHTML=h;
+  }
+}
+function renderPlanOffline(){
+  var wn=S.weak.filter(function(id){return AT.some(function(t){return t.id===id;});}).map(tname);
+  var nx=AT.filter(function(t){return S.done.indexOf(t.id)===-1;}).slice(0,3);
+  renderPlan({
+    analysis:'Пройдено '+S.done.length+' из '+AT.length+' тем ('+S.progress+'%). '+(wn.length?'Слабые: '+wn.join(', ')+'.':'Слабых нет!')+' Серия: '+S.streak+' дней.',
+    priority_topic:nx.length?nx[0].t:'Повторение пройденного',
+    motivation:S.streak>5?'Отличная серия '+S.streak+' дней! Продолжайте!':'Каждый день — шаг вперёд!',
+    week:[
+      {day:'День 1',tasks:['Урок: '+(nx[0]?nx[0].t:'Повторение'),'Карточки: 10 штук','Диктант: 5 слов']},
+      {day:'День 2',tasks:['Диалог: В магазине','Тест: 10 вопросов','AI-чат: 5 минут']},
+      {day:'День 3',tasks:['Урок: '+(nx[1]?nx[1].t:'Повторение'),'Карточки: 15 штук','Проверка текста']},
+      {day:'День 4',tasks:['Повторить слабые темы','Диктант: 5 фраз','Диалог: В кафе']},
+      {day:'День 5',tasks:['Урок: '+(nx[2]?nx[2].t:'Практика'),'Карточки: 10 штук','AI-чат']},
+      {day:'День 6',tasks:['Тест по пройденному','Написать текст 5 предложений','Диктант: предложения']},
+      {day:'День 7',tasks:['Свободная тема','Повторение карточек','Отдых и закрепление']}
+    ],
+    tips:['Учите глаголы сразу парами: читать → прочитать','Падежи — через вопросы: Кто? Что? Кого?','15 минут каждый день лучше 2 часов раз в неделю']
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SMART HINTS
+// ═══════════════════════════════════════════════════════
+function trackError(topic,rule){
+  if(!topic)return;
+  var key=topic+'|'+(rule||'');
+  S.errLog=S.errLog||{};
+  S.errLog[key]=(S.errLog[key]||0)+1;
+  if(S.errLog[key]===3){
+    var t=document.getElementById('sh-title-text');
+    var tx=document.getElementById('sh-text-content');
+    var banner=document.getElementById('smart-hint-banner');
+    if(t)t.textContent='💡 Умная подсказка: '+tname(topic);
+    if(tx)tx.textContent='Вы уже 3 раза ошиблись по этой теме. Рекомендуем повторить урок или открыть персональный план.';
+    if(banner){banner.style.display='block';clearTimeout(window._sht);window._sht=setTimeout(function(){banner.style.display='none';},7000);}
+  }
+}
+function closeSmartHint(){var b=document.getElementById('smart-hint-banner');if(b)b.style.display='none';}
+
+// ═══════════════════════════════════════════════════════
+// XP & ACTIVITY
+// ═══════════════════════════════════════════════════════
 function addXP(amt,lbl){
-  S.xp+=amt;const thr=S.xpLevel*100;
-  if(S.xp>=thr){S.xp-=thr;S.xpLevel++;toast('⬆️ Уровень '+S.xpLevel+'!','xp');}
+  S.xp+=amt;var thr=S.xpLv*100;
+  // Log XP for chart
+  var today=new Date().toISOString().slice(0,10);
+  if(!S.xpLog)S.xpLog={};
+  S.xpLog[today]=(S.xpLog[today]||0)+amt;
+  if(S.xp>=thr){S.xp-=thr;S.xpLv++;toast('⬆️ Уровень '+S.xpLv+'!','xp');}
   if(lbl)toast(lbl,'xp');
   updXP();save();
 }
 function updXP(){
-  const thr=S.xpLevel*100;
+  var thr=S.xpLv*100;
   document.getElementById('xpv').textContent=S.xp;
   document.getElementById('xpn').textContent=thr-S.xp;
   document.getElementById('xpb').style.width=Math.round((S.xp/thr)*100)+'%';
 }
-
-// ACTIVITY
 function logDay(){
-  const d=new Date().toISOString().slice(0,10);
-  S.log[d]=(S.log[d]||0)+1;
-  S.streak=Math.max(S.streak,1);save();
+  var d=new Date().toISOString().slice(0,10);
+  S.log[d]=(S.log[d]||0)+1;S.streak=Math.max(S.streak,1);save();
 }
+
+// ═══════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════
+function renderChart(barId,lblId){
+  var bars=document.getElementById(barId);var lbls=document.getElementById(lblId);
+  if(!bars||!lbls)return;
+  var vals=[],labels=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var k=d.toISOString().slice(0,10);
+    vals.push((S.xpLog&&S.xpLog[k])||0);
+    labels.push(d.toLocaleDateString('ru',{weekday:'short'}));
+  }
+  var max=Math.max.apply(null,vals)||1;
+  var bHtml='',lHtml='';
+  vals.forEach(function(v,i){
+    var h=Math.round((v/max)*60)+4;
+    bHtml+='<div class="chart-bar" style="height:'+h+'px" data-val="'+v+' XP" title="'+labels[i]+': '+v+' XP"></div>';
+    lHtml+='<div class="chart-lbl">'+labels[i]+'</div>';
+  });
+  bars.innerHTML=bHtml;lbls.innerHTML=lHtml;
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS BARS
+// ═══════════════════════════════════════════════════════
+function renderProgBars(){
+  var el=document.getElementById('prog-bars');if(!el)return;
+  var h='';
+  var items=[
+    {label:'Общий прогресс',val:S.progress,cls:'acc'},
+    {label:'Карточки (заучено)',val:Math.round((S.cards.filter(function(c){return c.reps>=3;}).length/S.cards.length)*100),cls:'ok'},
+    {label:'Слабые темы',val:Math.min(100,S.weak.length*10),cls:'warn'},
+  ];
+  items.forEach(function(item){
+    h+='<div class="prog-bar-wrap"><div class="prog-bar-label"><span>'+item.label+'</span><span>'+item.val+'%</span></div>'
+      +'<div class="prog-bar-track"><div class="prog-bar-fill '+item.cls+'" style="width:'+item.val+'%"></div></div></div>';
+  });
+  el.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function setMethod(m){
+  S.method=m;
+  document.querySelectorAll('.mc').forEach(function(c){c.classList.remove('active');});
+  var el=document.getElementById('m-'+m);if(el)el.classList.add('active');
+  save();var n={spaced:'🧠 Интервальное повторение',immersion:'🌊 Погружение',chunks:'🧩 Чанки',shadowing:'🗣️ Шэдоуинг'};
+  toast(n[m]||'','ok');
+}
+function setLv(lv){
+  S.level=lv;
+  document.querySelectorAll('.lo').forEach(function(o){o.classList.remove('sel');});
+  var el=document.getElementById('l'+lv.toLowerCase());if(el)el.classList.add('sel');
+  document.getElementById('lvl-badge').textContent=lv;
+  document.getElementById('drawer-lv-badge').textContent=lv;
+  S.cache={};save();
+}
+function doReset(){if(!confirm('Сбросить весь прогресс?'))return;localStorage.removeItem('rmv7');localStorage.removeItem('rmk');location.reload();}
+function doReport(){
+  var lines=['RUSMASTER ULTRA — ОТЧЁТ','═══════════════════════════',
+    'Дата: '+new Date().toLocaleDateString('ru-RU'),
+    'Уровень: '+S.level+' | XP: '+S.xp+' | Серия: '+S.streak+' дней',
+    'Прогресс: '+S.progress+'% | Тем: '+S.done.length+'/'+AT.length,
+    '','СЛАБЫЕ ТЕМЫ:'].concat(S.weak.filter(function(id){return AT.some(function(t){return t.id===id;});}).map(function(id){return '  • '+tname(id);}))
+    .concat(['','РЕКОМЕНДАЦИИ:','  • Повторяйте 1→3→7→21 день','  • 5 предложений в день','  • Читайте вслух']);
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}));
+  a.download='rusmaster-'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// HEATMAP
+// ═══════════════════════════════════════════════════════
 function renderHmap(){
-  let h='';
-  for(let i=27;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const k=d.toISOString().slice(0,10);
-    const n=S.log[k]||0;
-    const l=n===0?'':n<=1?'l1':n<=3?'l2':n<=5?'l3':'l4';
+  var h='';
+  for(var i=27;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var k=d.toISOString().slice(0,10);var n=S.log[k]||0;
+    var l=n===0?'':n<=1?'l1':n<=3?'l2':n<=5?'l3':'l4';
     h+='<div class="hc '+l+'" title="'+k+'"></div>';
   }
   document.getElementById('hmap').innerHTML=h;
 }
 
-// SETTINGS
-window.setMethod=(m)=>{
-  S.method=m;
-  document.querySelectorAll('.mc').forEach(c=>c.classList.remove('active'));
-  document.getElementById('m-'+m)?.classList.add('active');
-  save();
-  const names={spaced:'🧠 Интервальное повторение',immersion:'🌊 Погружение',chunks:'🧩 Чанки',shadowing:'🗣️ Шэдоуинг'};
-  toast(names[m]||'','ok');
-};
-window.doSetLevel=(lv)=>{
-  S.level=lv;
-  document.querySelectorAll('.lo').forEach(o=>o.classList.remove('sel'));
-  document.getElementById('l'+lv.toLowerCase())?.classList.add('sel');
-  document.getElementById('lvl-badge').textContent=lv;
-  S.cache={};save();
-};
-window.doReset=()=>{
-  if(!confirm('Сбросить весь прогресс? Это действие нельзя отменить.'))return;
-  localStorage.removeItem('rmv5');localStorage.removeItem('rmk');location.reload();
-};
-window.doReport=()=>{
-  const lines=[
-    'RUSMASTER ULTRA — ОТЧЁТ ОБ ОБУЧЕНИИ',
-    '════════════════════════════════════',
-    'Дата: '+new Date().toLocaleDateString('ru-RU'),
-    'Уровень: '+S.level+' | XP: '+S.xp+' | Серия: '+S.streak+' дней',
-    'Прогресс курса: '+S.progress+'%',
-    'Тем пройдено: '+S.completed.length+'/'+AT.length,
-    'Метод обучения: '+S.method,
-    '',
-    'СЛАБЫЕ ТЕМЫ ДЛЯ ПОВТОРЕНИЯ:',
-    ...S.weak.map(id=>'  • '+tname(id)),
-    '',
-    'РЕКОМЕНДАЦИИ:',
-    '  • Повторяйте каждые 1, 3, 7, 21 день',
-    '  • Пишите 5 предложений каждый день',
-    '  • Читайте текст вслух для произношения',
-    '  • 15 минут в день лучше, чем 2 часа в неделю',
-  ];
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}));
-  a.download='rusmaster-'+new Date().toISOString().slice(0,10)+'.txt';a.click();
-};
-
+// ═══════════════════════════════════════════════════════
 // TOAST
-let ttmr;
+// ═══════════════════════════════════════════════════════
+var TT;
 function toast(msg,type){
-  if(!msg)return;
-  const t=document.getElementById('toast');
+  if(!msg)return;var t=document.getElementById('toast');
   t.textContent=msg;t.className='toast '+(type||'ok')+' show';
-  clearTimeout(ttmr);ttmr=setTimeout(()=>t.classList.remove('show'),2500);
+  clearTimeout(TT);TT=setTimeout(function(){t.classList.remove('show');},2500);
 }
 
+// ═══════════════════════════════════════════════════════
 // RENDER ALL
+// ═══════════════════════════════════════════════════════
 function renderAll(){
   document.getElementById('sv').textContent=S.streak;
   document.getElementById('lvl-badge').textContent=S.level;
-  const circ=238.8;
+  document.getElementById('drawer-lv-badge').textContent=S.level;
+  var circ=232.5;
   document.getElementById('rp').style.strokeDashoffset=circ-(S.progress/100)*circ;
   document.getElementById('hpct').textContent=S.progress+'%';
   document.getElementById('hsub').textContent=
     S.progress===0?'Начните первый урок прямо сейчас':
-    S.progress<50?S.completed.length+' тем пройдено — продолжайте!':
-    S.progress<90?S.completed.length+' тем пройдено — вы почти у цели!':
-    '🎉 Весь курс пройден! Вы великолепны!';
+    S.progress<50?S.done.length+' тем пройдено — продолжайте!':
+    S.progress<90?S.done.length+' тем пройдено — вы почти у цели!':
+    '🎉 Весь курс пройден!';
   updXP();
-  const now=Date.now();
-  const due=S.cards.filter(c=>c.next<=now).length;
+  var now=Date.now();
+  var due=S.cards.filter(function(c){return c.next<=now;}).length;
   document.getElementById('src').textContent=due;
   document.getElementById('srbtn').style.display=due>0?'block':'none';
-  const next=AT.find(t=>!S.completed.includes(t.id));
-  const pl=[];
+  // Plan
+  var next=null;for(var i=0;i<AT.length;i++){if(S.done.indexOf(AT[i].id)===-1){next=AT[i];break;}}
+  var pl=[];
   if(next)pl.push('📚 Урок: '+next.t);
   if(due>0)pl.push('🃏 Карточки: '+due+' штук');
   if(!S.quizDone)pl.push('🎯 Ежедневный тест');
-  pl.push('📝 Проверить текст в разделе ТЕКСТ');
-  pl.push('🤖 Задать вопрос AI-репетитору');
+  pl.push('📝 Проверить текст');
+  pl.push('🤖 Задать вопрос AI');
   if(S.weak.length>0)pl.push('⚠️ Повторить: '+tname(S.weak[S.weak.length-1]));
-  document.getElementById('plan').innerHTML=pl.map(p=>'<li>'+p+'</li>').join('');
+  document.getElementById('plan').innerHTML=pl.map(function(p){return'<li>'+p+'</li>';}).join('');
+  // Stats
   document.getElementById('sgrid').innerHTML=
-    '<div class="sb2"><div class="sn">'+S.completed.length+'</div><div class="sl">ТЕМ</div></div>'
-    +'<div class="sb2"><div class="sn">'+S.xpLevel+'</div><div class="sl">УРОВЕНЬ</div></div>'
+    '<div class="sb2"><div class="sn">'+S.done.length+'</div><div class="sl">ТЕМ</div></div>'
+    +'<div class="sb2"><div class="sn">'+S.xpLv+'</div><div class="sl">УРОВЕНЬ</div></div>'
     +'<div class="sb2"><div class="sn">'+S.cards.length+'</div><div class="sl">КАРТОЧЕК</div></div>'
     +'<div class="sb2"><div class="sn">'+S.weak.length+'</div><div class="sl">СЛАБЫХ</div></div>';
-  document.getElementById('wlist').innerHTML=S.weak.length
-    ?S.weak.map(id=>'<span class="ttag weak" onclick="loadLesson(\''+id+'\')">'+tname(id)+'</span>').join('')
-    :'<span style="color:var(--muted);font-size:12px">Слабых мест нет. Отлично!</span>';
-  renderHmap();
-  document.querySelectorAll('.mc').forEach(c=>c.classList.remove('active'));
-  document.getElementById('m-'+S.method)?.classList.add('active');
-  document.querySelectorAll('.lo').forEach(o=>o.classList.remove('sel'));
-  document.getElementById('l'+S.level.toLowerCase())?.classList.add('sel');
+  // Weak list
+  var vw=S.weak.filter(function(id){return AT.some(function(t){return t.id===id;});});
+  document.getElementById('wlist').innerHTML=vw.length
+    ?vw.map(function(id){return'<span class="ttag weak" onclick="loadLesson(\''+id+'\')">'+tname(id)+'</span>';}).join('')
+    :'<span style="color:var(--mut);font-size:12px">Слабых мест нет. Отлично!</span>';
+  // Bookmarks
+  var bl=document.getElementById('bookmarks-list');
+  if(bl)bl.innerHTML=S.bookmarks.length
+    ?S.bookmarks.map(function(id){return'<span class="ttag" onclick="loadLesson(\''+id+'\')">🔖 '+tname(id)+'</span>';}).join('')
+    :'<span style="color:var(--mut);font-size:12px">Закладок нет. Нажмите ♡ в уроке.</span>';
+  renderHmap();renderProgBars();
+  renderChart('xp-chart','xp-labels');
+  renderChart('prog-chart','prog-labels');
+  // Methods
+  document.querySelectorAll('.mc').forEach(function(c){c.classList.remove('active');});
+  var mc=document.getElementById('m-'+S.method);if(mc)mc.classList.add('active');
+  // Level
+  document.querySelectorAll('.lo').forEach(function(o){o.classList.remove('sel');});
+  var lo=document.getElementById('l'+S.level.toLowerCase());if(lo)lo.classList.add('sel');
+  // AI status
+  setAIStatus(!!S.key&&!S.offline);
+  updateAPIStatus();
 }
 
-window.startSession=()=>{
-  const now=Date.now();
-  const due=S.cards.filter(c=>c.next<=now).length;
-  if(due>0)startFC();
-  else if(!S.quizDone)gotoQuiz();
-  else{const next=AT.find(t=>!S.completed.includes(t.id));if(next)loadLesson(next.id);else gotoChat();}
-};
-
-if('serviceWorker' in navigator){
-  const sw="self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));";
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+function startSession(){
+  var now=Date.now();
+  var due=S.cards.filter(function(c){return c.next<=now;}).length;
+  if(due>0){startFC();return;}
+  if(!S.quizDone){nav('s-quiz','n-quiz');loadQuiz();return;}
+  var next=null;for(var i=0;i<AT.length;i++){if(S.done.indexOf(AT[i].id)===-1){next=AT[i];break;}}
+  if(next)loadLesson(next.id);else nav('s-chat','n-chat');
 }
 </script></body></html>
